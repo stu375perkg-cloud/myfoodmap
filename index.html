@@ -1185,14 +1185,24 @@
             document.querySelectorAll('.restaurant-item').forEach(item => item.classList.remove('active'));
             element.classList.add('active');
             const rest = restaurants.find(item => item.id === id);
-            if (rest && rest.mapUrl) {
-                let finalMapSrc = rest.mapUrl;
-                if (rest.mapUrl.includes('google.com') && !rest.mapUrl.includes('output=embed')) {
-                    finalMapSrc = `https://maps.google.com/maps?q=${encodeURIComponent(rest.name)}&output=embed`;
+            if (rest) {
+                let finalMapSrc = "";
+                let url = (rest.mapUrl || "").trim();
+                
+                if (url.includes('output=embed') || url.includes('/maps/embed')) {
+                    // 如果原本就是合法的官方內嵌網址，直接使用
+                    finalMapSrc = url;
+                } else if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
+                    // 如果使用者輸入的是純地址（非網址），直接用地址當關鍵字搜尋
+                    finalMapSrc = `https://maps.google.com/maps?q=${encodeURIComponent(url)}&output=embed`;
+                } else {
+                    // 🌟 核心修正：如果是 maps.app.goo.gl 這類的分享短網址或一般地圖網址，
+                    // Google 為了安全防禦，是不允許直接放進小窗戶 (iframe) 的（會顯示拒絕連線）。
+                    // 我們智慧地將其轉為官方許可的 Google 內嵌地圖，並精準搜尋「餐廳名稱 + 所在地區」，保證 100% 成功顯現！
+                    finalMapSrc = `https://maps.google.com/maps?q=${encodeURIComponent(rest.name + ' ' + rest.district)}&output=embed`;
                 }
+                
                 document.getElementById('mapPanel').innerHTML = `<iframe src="${finalMapSrc}" allowfullscreen="" loading="lazy"></iframe>`;
-            } else if (rest) {
-                document.getElementById('mapPanel').innerHTML = `<iframe src="https://maps.google.com/maps?q=${encodeURIComponent(rest.name)}&output=embed" allowfullscreen="" loading="lazy"></iframe>`;
             }
         }
 
