@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的專屬美食地圖資料庫 - Google 雲端共享版</title>
+    <style>
+        /* 基礎樣式設定 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            color: #212529;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* 左邊控制與清單欄位 */
+        .left-panel {
+            width: 450px;
+            background-color: #ffffff;
+            border-right: 1px solid #dee2e6;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+            z-index: 10;
+        }
+
+        .header {
+            padding: 16px 20px;
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            margin-bottom: 3px;
+            letter-spacing: 1px;
+        }
+
+        /* 雲端同步設定面板 */
+        .sync-container {
+            background-color: #f1f3f5;
+            border-bottom: 1px solid #dee2e6;
+            padding: 12px 20px;
+        }
+
+        .sync-status-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .sync-status-badge {
+            font-size: 13px;
+            font-weight: bold;
+            color: #495057;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .sync-input-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .sync-input {
+            flex: 1;
+            padding: 6px 10px !important;
+            font-size: 12px !important;
+            border-radius: 4px !important;
+            border: 1px solid #ced4da;
+        }
+
+        .btn-sync-connect {
+            background-color: #1a1a1a;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background-color 0.2s;
+        }
+
+        .btn-sync-connect:hover {
+            background-color: #333333;
+        }
+
+        /* 複製連結與自訂金鑰按鈕區 */
+        .sync-action-row {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .sync-button-group {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .btn-copy-link {
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            transition: background-color 0.2s;
+            flex: 1;
+        }
+
+        .btn-copy-link:hover {
+            background-color: #0052a3;
+        }
+
+        .btn-custom-key {
+            background-color: #495057;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            transition: background-color 0.2s;
+            flex: 1;
+        }
+
+        .btn-custom-key:hover {
+            background-color: #343a40;
+        }
+
+        .btn-sync-disconnect {
+            background: none;
+            border: none;
+            color: #dc3545;
+            font-size: 11px;
+            cursor: pointer;
+            text-decoration: underline;
+            padding: 0;
+            text-align: right;
+            display: inline-block;
+            margin-top: 4px;
+            width: fit-content;
+            align-self: flex-end;
+        }
+
+        /* 手把手引導引導盒 */
+        .setup-guide-banner {
+            background-color: #fff9db;
+            border: 1px solid #ffe066;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 8px;
+            font-size: 12px;
+            color: #856404;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            line-height: 1.4;
+        }
+
+        .setup-guide-banner:hover {
+            background-color: #fff3bf;
+        }
+
+        /* 自訂金鑰輸入彈出區 */
+        .key-config-box {
+            display: none;
+            background-color: #ffffff;
+            border: 1px solid #ced4da;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 13px;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .guide-step {
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        /* 分頁標籤樣式 */
+        .tab-bar {
+            display: flex;
+            background-color: #f1f3f5;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px 10px;
+            background: none;
+            border: none;
+            font-size: 14px;
+            font-weight: bold;
+            color: #6c757d;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .tab-btn:hover {
+            color: #1a1a1a;
+            background-color: #e9ecef;
+        }
+
+        .tab-btn.active {
+            color: #1a1a1a;
+            border-bottom-color: #1a1a1a;
+            background-color: #ffffff;
+        }
+
+        /* 分頁內容容器 */
+        .tab-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .tab-pane {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .tab-pane.active {
+            display: flex;
+        }
+
+        /* 表單區域 */
+        .form-container {
+            padding: 16px 20px;
+            overflow-y: auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .form-title {
+            font-size: 15px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #1a1a1a;
+            border-left: 4px solid #1a1a1a;
+            padding-left: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 4px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 4px;
+            color: #495057;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: #1a1a1a;
+        }
+
+        /* 外送勾選框樣式 */
+        .delivery-checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background-color: #f8f9fa;
+            border: 1px solid #ced4da;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            user-select: none;
+        }
+
+        .delivery-checkbox-container:hover {
+            background-color: #f1f3f5;
+        }
+
+        .delivery-checkbox-container input {
+            width: auto;
+            cursor: pointer;
+        }
+
+        /* 摺疊式營業時間面板 */
+        .form-hours-toggle {
+            background-color: #f1f3f5;
+            border: 1px solid #dee2e6;
+            color: #495057;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 5px;
+            transition: background-color 0.2s;
+        }
+
+        .form-hours-toggle:hover {
+            background-color: #e9ecef;
+        }
+
+        .week-hours-input {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 5px;
+            display: grid;
+            grid-template-columns: 1fr 2.5fr;
+            gap: 6px;
+            max-height: 150px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+        }
+
+        .week-hours-input label {
+            font-weight: normal;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+        }
+
+        .week-hours-input input {
+            padding: 5px 8px;
+            font-size: 12px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: auto;
+            padding-top: 15px;
+            padding-bottom: 10px;
+        }
+
+        .btn-submit {
+            background-color: #1a1a1a;
+            color: white;
+            border: none;
+            padding: 10px;
+            flex: 2;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+            transition: background-color 0.2s;
+        }
+
+        .btn-submit:hover {
+            background-color: #333333;
+        }
+
+        .btn-cancel-edit {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px;
+            flex: 1;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+            transition: background-color 0.2s;
+        }
+
+        .btn-cancel-edit:hover {
+            background-color: #5a6268;
+        }
+
+        /* 篩選搜尋區域 */
+        .filter-container {
+            padding: 12px 20px;
+            border-bottom: 1px solid #dee2e6;
+            background-color: #fdfdfd;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        /* 美食清單列表 */
+        .restaurant-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            background-color: #f8f9fa;
+        }
+
+        .restaurant-item {
+            background: #ffffff;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .restaurant-item:hover {
+            border-color: #1a1a1a;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .restaurant-item.active {
+            border-left: 6px solid #1a1a1a;
+            background-color: #fafafa;
+        }
+
+        .item-title {
+            font-size: 15px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #1a1a1a;
+            gap: 10px;
+        }
+
+        .item-title span:first-child {
+            flex: 1;
+            word-break: break-all;
+        }
+
+        .item-meta {
+            font-size: 12px;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 6px;
+            font-size: 11px;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .badge-style {
+            background-color: #e9ecef;
+            color: #495057;
+        }
+
+        .badge-district {
+            background-color: #e2f0d9;
+            color: #385723;
+        }
+
+        .badge-delivery {
+            background-color: #ffe3e3;
+            color: #e03131;
+        }
+
+        .rating-stars {
+            color: #ffc107;
+            font-weight: bold;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .item-notes {
+            font-size: 12px;
+            color: #495057;
+            background-color: #fff9db;
+            border-left: 3px solid #f59f00;
+            padding: 6px 10px;
+            margin-top: 4px;
+            border-radius: 0 4px 4px 0;
+            line-height: 1.4;
+            word-break: break-all;
+        }
+
+        .hours-toggle-btn {
+            background: none;
+            border: none;
+            color: #0066cc;
+            font-size: 12px;
+            cursor: pointer;
+            padding: 4px 0;
+            margin-top: 2px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            text-decoration: none;
+            width: fit-content;
+        }
+
+        .hours-toggle-btn:hover {
+            text-decoration: underline;
+        }
+
+        .item-hours-detail {
+            display: none;
+            margin-top: 4px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #495057;
+            border: 1px dashed #dee2e6;
+        }
+
+        .item-hours-detail div {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+
+        .item-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 6px;
+            padding-top: 8px;
+            border-top: 1px solid #f1f3f5;
+        }
+
+        .btn-action {
+            background: none;
+            border: none;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background-color 0.1s;
+        }
+
+        .btn-action-edit {
+            color: #0066cc;
+        }
+
+        .btn-action-edit:hover {
+            background-color: #e6f0fa;
+        }
+
+        .btn-action-delete {
+            color: #dc3545;
+        }
+
+        .btn-action-delete:hover {
+            background-color: #fde8e9;
+        }
+
+        /* 大地圖區域 */
+        .right-panel {
+            flex: 1;
+            height: 100%;
+            background-color: #e5e5e5;
+            position: relative;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .map-placeholder {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #6c757d;
+        }
+
+        .custom-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .custom-modal {
+            background-color: #ffffff;
+            padding: 24px;
+            border-radius: 8px;
+            width: 350px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+        }
+
+        .modal-btn-confirm { background-color: #dc3545; color: white; }
+        .modal-btn-cancel { background-color: #e9ecef; color: #495057; }
+
+        .toast-notification {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background-color: #1a1a1a;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1100;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .toast-notification.show { transform: translateY(0); opacity: 1; }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; height: 100vh; overflow: hidden; }
+            .left-panel { width: 100%; height: 60%; border-right: none; border-bottom: 1px solid #dee2e6; }
+            .right-panel { width: 100%; height: 40%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="left-panel">
+        <div class="header">
+            <h1>我的美食地圖資料庫</h1>
+            <p style="font-size: 12px; opacity: 0.7;">簡約現代風 • Google 雲端即時版</p>
+        </div>
+
+        <div class="sync-container">
+            <div class="sync-status-row">
+                <span id="syncStatusText" class="sync-status-badge">⚫ 單機保存模式</span>
+                <button id="btnDisconnect" class="btn-sync-disconnect" onclick="disconnectCloud()" style="display: none;">中斷連線</button>
+            </div>
+            
+            <div class="sync-input-group" id="syncInputGroup">
+                <input type="text" id="shareCodeInput" class="sync-input" placeholder="請自訂共享暗號 (例如：公司下午茶團、好友吃貨群)">
+                <button class="btn-sync-connect" onclick="connectToCloud()">連線同步</button>
+            </div>
+
+            <div class="setup-guide-banner" id="setupGuideBanner" onclick="toggleCustomKeyConfig()">
+                <span>💡 想要與大家即時共編嗎？點此開啟「2 分鐘免費雲端設定」！</span>
+                <button style="background: #f59f00; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; white-space: nowrap; margin-left: 10px;">去設定</button>
+            </div>
+            
+            <div class="sync-action-row" id="syncActionRow" style="display: none;">
+                <div class="sync-button-group">
+                    <button class="btn-copy-link" onclick="copyShareLink()">
+                        📋 複製專屬分享連結給好友
+                    </button>
+                    <button class="btn-custom-key" onclick="toggleCustomKeyConfig()">
+                        ⚙️ 自訂 Google 雲端金鑰
+                    </button>
+                </div>
+            </div>
+
+            <div class="key-config-box" id="keyConfigBox">
+                <div style="background-color: #e8f4fd; border-left: 4px solid #0066cc; padding: 10px; border-radius: 0 6px 6px 0; margin-bottom: 12px; color: #2b4c7e;">
+                    <p style="font-weight: bold; margin-bottom: 4px;">☁️ 如何開啟多裝置共享編輯（免花錢）：</p>
+                    <div style="margin-bottom:4px;">1. 打開 <a href="https://console.firebase.google.com/" target="_blank" style="color: #0066cc; font-weight: bold; text-decoration: underline;">Google Firebase 官網</a> 建立新專案。</div>
+                    <div style="margin-bottom:4px;">2. 點擊網頁版按鈕 <code>&lt;/&gt;</code> 註冊應用程式。</div>
+                    <div style="margin-bottom:4px;">3. 複製產生的 <code>firebaseConfig</code> 大括號內所有代碼。</div>
+                    <div style="margin-bottom:4px;">4. 記得到左側點「Firestore Database」建立資料庫（以測試模式啟動）。</div>
+                    <div>5. 點「Authentication」在登入方法內把「匿名 (Anonymous)」啟用並儲存。</div>
+                </div>
+                
+                <p style="font-weight: bold; margin-bottom: 4px;">✏️ 請在下方貼上您複製的大括號 <code>{ ... }</code> 內容：</p>
+                <textarea id="customFirebaseConfigInput" rows="4" style="font-family: monospace; font-size: 11px; padding: 8px; border-radius: 6px; border: 1px solid #ced4da;" placeholder='{"apiKey": "...", "projectId": "..."}'></textarea>
+                <button class="btn-sync-connect" onclick="saveCustomFirebaseConfig()" style="padding: 8px 16px; margin-top: 4px; width: auto; align-self: flex-end; border-radius: 6px;">儲存並重連雲端</button>
+            </div>
+
+            <p id="syncDesc" style="font-size: 11px; color: #6c757d; margin-top: 5px; line-height: 1.3;">
+                採用 Google 官方 Firebase Firestore 高速通道！任何人在手機、電腦修改，另一端秒速同步！
+            </p>
+        </div>
+
+        <div class="tab-bar">
+            <button id="tab-list-btn" class="tab-btn active" onclick="switchTab('list')">
+                🔍 口袋美食清單
+            </button>
+            <button id="tab-form-btn" class="tab-btn" onclick="switchTab('form')">
+                ➕ 新增美食商家
+            </button>
+        </div>
+
+        <div class="tab-content">
+            <div id="pane-list" class="tab-pane active">
+                <div class="filter-container">
+                    <div class="form-row">
+                        <select id="filterTime" onchange="renderList()" style="flex: 1;">
+                            <option value="">全部時段</option>
+                            <option value="早餐">早餐</option>
+                            <option value="午餐">午餐</option>
+                            <option value="晚餐">晚餐</option>
+                            <option value="點心宵夜">點心宵夜</option>
+                        </select>
+                        <select id="filterDistrict" onchange="renderList()" style="flex: 1;">
+                            <option value="">全部地區</option>
+                        </select>
+                    </div>
+                    <input type="text" id="searchKeyword" placeholder="搜尋店名、風格、地區、備註..." oninput="renderList()">
+                </div>
+                <div class="restaurant-list" id="restaurantList"></div>
+            </div>
+
+            <div id="pane-form" class="tab-pane">
+                <div class="form-container">
+                    <div class="form-title" id="formPanelTitle">新增美食商家資訊</div>
+                    
+                    <div class="form-group">
+                        <label>餐廳名稱 *</label>
+                        <input type="text" id="restName" placeholder="例如：古早味煎餃 粉漿蛋餅">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group" style="flex: 1;">
+                            <label>用餐時段</label>
+                            <select id="restTimeSlot">
+                                <option value="早餐">早餐</option>
+                                <option value="午餐" selected>午餐</option>
+                                <option value="晚餐">晚餐</option>
+                                <option value="點心宵夜">點心宵夜</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label>餐廳風格</label>
+                            <input type="text" id="restStyle" placeholder="如：早餐店、泰式料理、拉麵">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group" style="flex: 1;">
+                            <label>所在地區</label>
+                            <input type="text" id="restDistrict" placeholder="如：大園區、五股區">
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label>Google 評分 (1~5)</label>
+                            <input type="number" id="restRating" min="1" max="5" step="0.1" value="4.5">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>外送服務</label>
+                        <div class="delivery-checkbox-container" id="deliveryContainer">
+                            <input type="checkbox" id="restDelivery">
+                            <span>🛵 提供外送服務 / 平台合作</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Google 地圖網址 * (完整分享連結)</label>
+                        <input type="text" id="restMapUrl" placeholder="http://...">
+                    </div>
+
+                    <div class="form-group">
+                        <label>美味備註 / 推薦菜色 (可選填)</label>
+                        <input type="text" id="restNotes" placeholder="如：必點粉漿蛋餅、特製辣醬超讚！">
+                    </div>
+
+                    <div>
+                        <div class="form-hours-toggle" onclick="toggleFormHours()">
+                            <span>⏰ 設定各週營業時間 (可留空)</span>
+                            <span id="formHoursArrow">▾</span>
+                        </div>
+                        <div id="formHoursContainer" style="display: none;">
+                            <div class="week-hours-input">
+                                <label>週一</label><input type="text" id="h-mon" placeholder="如 06:00-10:30">
+                                <label>週二</label><input type="text" id="h-tue" placeholder="如 06:00-10:30">
+                                <label>週三</label><input type="text" id="h-wed" placeholder="如 06:00-10:30">
+                                <label>週四</label><input type="text" id="h-thu" placeholder="如 06:00-10:30">
+                                <label>週五</label><input type="text" id="h-fri" placeholder="如 06:00-10:30">
+                                <label>週六</label><input type="text" id="h-sat" placeholder="如 06:00-10:30">
+                                <label>週日</label><input type="text" id="h-sun" placeholder="如 休息">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button class="btn-submit" id="btnSubmitForm" onclick="handleSubmit()">加入我的美食地圖</button>
+                        <button class="btn-cancel-edit" id="btnCancelEdit" onclick="cancelEditMode()" style="display: none;">取消修改</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="right-panel" id="mapPanel">
+        <div class="map-placeholder">
+            <h2>歡迎使用美食地圖</h2>
+            <p style="margin-top: 10px;">請在左側點選餐廳，右側將會精準顯現地圖畫面</p>
+        </div>
+    </div>
+
+    <div class="custom-modal-overlay" id="confirmModal">
+        <div class="custom-modal">
+            <h3 id="modalTitle">確認操作</h3>
+            <p id="modalMessage">您確定要執行此操作嗎？</p>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-cancel" onclick="closeConfirmModal()">取消</button>
+                <button class="modal-btn modal-btn-confirm" id="modalConfirmBtn">確定</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-notification" id="toastMessage"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        let app = null, db = null, auth = null, firebaseUser = null, unsubscribeListener = null, firebaseInitialized = false;
+
+        // 預設的乾淨空白模板範例
+        const defaultTemplate = [
+            {
+                id: 1,
+                name: "古早味煎餃 粉漿蛋餅 (範例項目)",
+                timeSlot: "早餐",
+                style: "古早味早餐",
+                district: "大園區",
+                rating: "4.5",
+                notes: "歡迎使用！只要在上方輸入不同的代碼，每個代碼都擁有 100% 獨立的專屬清單空間喔！",
+                hasDelivery: false,
+                mapUrl: "",
+                hours: { mon: "休息", tue: "06:00-10:30", wed: "06:00-10:30", thu: "06:00-10:30", fri: "06:00-10:30", sat: "06:00-10:30", sun: "06:00-10:30" }
+            }
+        ];
+
+        let restaurants = defaultTemplate;
+        let editingId = null;
+        let currentRoomCode = null;
+        let lastSyncTimestamp = 0;
+
+        function getSafeBasketName(roomCode) {
+            let hex = '';
+            for (let i = 0; i < roomCode.length; i++) {
+                hex += roomCode.charCodeAt(i).toString(16).padStart(4, '0');
+            }
+            return 'box_' + hex;
+        }
+
+        // 智慧升級：將舊欄位補齊，並修復「地區與風格」拆分
+        function upgradeOldData() {
+            let hasUpgraded = false;
+            restaurants.forEach(item => {
+                if (item.district === undefined) {
+                    if (item.style && item.style.includes('/')) {
+                        const parts = item.style.split('/');
+                        item.style = parts[0].trim();
+                        item.district = parts[1].trim();
+                    } else if (item.style && (item.style.includes('區') || item.style.includes('市'))) {
+                        item.district = item.style;
+                        item.style = "未分類";
+                    } else {
+                        item.district = "未填寫";
+                    }
+                    hasUpgraded = true;
+                }
+                if (item.notes === undefined) {
+                    item.notes = "";
+                    hasUpgraded = true;
+                }
+                if (item.hasDelivery === undefined) {
+                    item.hasDelivery = false;
+                    hasUpgraded = true;
+                }
+            });
+            if (hasUpgraded) {
+                saveDataLocalOnly();
+            }
+        }
+
+        function initFirebase() {
+            try {
+                let customConfigStr = localStorage.getItem('foodMap_customFirebaseConfig');
+                let configToUse = customConfigStr ? JSON.parse(customConfigStr) : null;
+                const isConfigValid = configToUse && configToUse.apiKey && configToUse.projectId;
+
+                if (!isConfigValid) {
+                    firebaseInitialized = false;
+                    document.getElementById('setupGuideBanner').style.display = 'flex';
+                    document.getElementById('syncStatusText').innerHTML = `⚫ 單機獨立保存模式`;
+                    loadLocalDataForRoom('local_standalone');
+                    return;
+                }
+
+                app = initializeApp(configToUse);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                firebaseInitialized = true;
+
+                signInAnonymously(auth).then((cred) => {
+                    firebaseUser = cred.user;
+                    document.getElementById('setupGuideBanner').style.display = 'none';
+                    const savedCode = localStorage.getItem('foodMap_shareCode') || window.location.hash.substring(1);
+                    if (savedCode) {
+                        connectToCloud(decodeURIComponent(savedCode));
+                    } else {
+                        loadLocalDataForRoom('local_standalone');
+                    }
+                }).catch((err) => {
+                    firebaseInitialized = false;
+                    document.getElementById('setupGuideBanner').style.display = 'flex';
+                    document.getElementById('syncStatusText').innerHTML = `⚫ 單機保存 (金鑰認證失敗)`;
+                    loadLocalDataForRoom('local_standalone');
+                });
+            } catch (err) {
+                firebaseInitialized = false;
+                document.getElementById('setupGuideBanner').style.display = 'flex';
+                loadLocalDataForRoom('local_standalone');
+            }
+        }
+
+        // 根據不同的房間代碼，載入完全獨立的本地暫存資料
+        function loadLocalDataForRoom(roomCode) {
+            const key = 'myFoodMap_' + getSafeBasketName(roomCode);
+            const timeKey = 'myFoodMap_timestamp_' + getSafeBasketName(roomCode);
+            
+            restaurants = JSON.parse(localStorage.getItem(key)) || defaultTemplate;
+            lastSyncTimestamp = parseInt(localStorage.getItem(timeKey)) || 0;
+            
+            updateDistrictDropdown();
+            renderList();
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+            if (tabName === 'list') {
+                document.getElementById('tab-list-btn').classList.add('active');
+                document.getElementById('pane-list').classList.add('active');
+            } else if (tabName === 'form') {
+                document.getElementById('tab-form-btn').classList.add('active');
+                document.getElementById('pane-form').classList.add('active');
+            }
+        }
+
+        function toggleFormHours() {
+            const container = document.getElementById('formHoursContainer');
+            const arrow = document.getElementById('formHoursArrow');
+            if (container.style.display === 'none') {
+                container.style.display = 'block';
+                arrow.textContent = '▴';
+            } else {
+                container.style.display = 'none';
+                arrow.textContent = '▾';
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toastMessage');
+            toast.innerHTML = `<span>✨ ${message}</span>`;
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+        }
+
+        function showConfirmModal(title, msg, onConfirmCallback) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalMessage').textContent = msg;
+            const confirmBtn = document.getElementById('modalConfirmBtn');
+            confirmBtn.onclick = function() { onConfirmCallback(); closeConfirmModal(); };
+            document.getElementById('confirmModal').style.display = 'flex';
+        }
+
+        function closeConfirmModal() { document.getElementById('confirmModal').style.display = 'none'; }
+
+        function updateDistrictDropdown() {
+            const dropdown = document.getElementById('filterDistrict');
+            if (!dropdown) return;
+            const districts = [...new Set(restaurants.map(r => r.district).filter(d => d && d !== "未填寫" && d !== ""))];
+            dropdown.innerHTML = '<option value="">全部地區</option>';
+            districts.forEach(dist => {
+                const opt = document.createElement('option');
+                opt.value = dist; opt.textContent = dist; dropdown.appendChild(opt);
+            });
+        }
+
+        function handleSubmit() {
+            const name = document.getElementById('restName').value.trim();
+            const timeSlot = document.getElementById('restTimeSlot').value;
+            const style = document.getElementById('restStyle').value.trim() || "未分類";
+            const district = document.getElementById('restDistrict').value.trim() || "未填寫";
+            const rating = document.getElementById('restRating').value.trim() || "5.0";
+            const hasDelivery = document.getElementById('restDelivery').checked;
+            const notes = document.getElementById('restNotes').value.trim();
+            let mapUrl = document.getElementById('restMapUrl').value.trim();
+
+            if (!name) { showToast('請填寫餐廳名稱喔！'); return; }
+
+            const hoursData = {
+                mon: document.getElementById('h-mon').value.trim() || "未填寫",
+                tue: document.getElementById('h-tue').value.trim() || "未填寫",
+                wed: document.getElementById('h-wed').value.trim() || "未填寫",
+                thu: document.getElementById('h-thu').value.trim() || "未填寫",
+                fri: document.getElementById('h-fri').value.trim() || "未填寫",
+                sat: document.getElementById('h-sat').value.trim() || "未填寫",
+                sun: document.getElementById('h-sun').value.trim() || "未填寫"
+            };
+
+            if (editingId !== null) {
+                const index = restaurants.findIndex(item => item.id === editingId);
+                if (index !== -1) {
+                    restaurants[index].name = name; restaurants[index].timeSlot = timeSlot;
+                    restaurants[index].style = style; restaurants[index].district = district;
+                    restaurants[index].rating = rating; restaurants[index].hasDelivery = hasDelivery;
+                    restaurants[index].notes = notes; restaurants[index].mapUrl = mapUrl;
+                    restaurants[index].hours = hoursData;
+                    saveData(); showToast('商家資訊修改成功！'); cancelEditMode(); renderList(); switchTab('list');
+                }
+            } else {
+                const newRest = {
+                    id: Date.now(), name: name, timeSlot: timeSlot, style: style, district: district,
+                    rating: rating, hasDelivery: hasDelivery, notes: notes, mapUrl: mapUrl, hours: hoursData
+                };
+                restaurants.push(newRest); saveData(); showToast('成功加入美食地圖！'); clearForm(); renderList(); switchTab('list');
+            }
+        }
+
+        function startEditRestaurant(id, event) {
+            event.stopPropagation();
+            const rest = restaurants.find(item => item.id === id);
+            if (!rest) return;
+            editingId = id;
+            document.getElementById('restName').value = rest.name;
+            document.getElementById('restTimeSlot').value = rest.timeSlot;
+            document.getElementById('restStyle').value = rest.style === "未分類" ? "" : rest.style;
+            document.getElementById('restDistrict').value = rest.district === "未填寫" ? "" : rest.district;
+            document.getElementById('restRating').value = rest.rating;
+            document.getElementById('restDelivery').checked = rest.hasDelivery || false;
+            document.getElementById('restMapUrl').value = rest.mapUrl;
+            document.getElementById('restNotes').value = rest.notes || "";
+            document.getElementById('h-mon').value = rest.hours.mon === "未填寫" ? "" : rest.hours.mon;
+            document.getElementById('h-tue').value = rest.hours.tue === "未填寫" ? "" : rest.hours.tue;
+            document.getElementById('h-wed').value = rest.hours.wed === "未填寫" ? "" : rest.hours.wed;
+            document.getElementById('h-thu').value = rest.hours.thu === "未填寫" ? "" : rest.hours.thu;
+            document.getElementById('h-fri').value = rest.hours.fri === "未填寫" ? "" : rest.hours.fri;
+            document.getElementById('h-sat').value = rest.hours.sat === "未填寫" ? "" : rest.hours.sat;
+            document.getElementById('h-sun').value = rest.hours.sun === "未填寫" ? "" : rest.hours.sun;
+            document.getElementById('formPanelTitle').innerHTML = `✏️ 正在修改：<span style="color: #0066cc;">${rest.name}</span>`;
+            document.getElementById('btnSubmitForm').textContent = "儲存修改";
+            document.getElementById('btnCancelEdit').style.display = "block";
+            document.getElementById('formHoursContainer').style.display = 'block';
+            switchTab('form');
+        }
+
+        function cancelEditMode() {
+            editingId = null; clearForm();
+            document.getElementById('formPanelTitle').textContent = "新增美食商家資訊";
+            document.getElementById('btnSubmitForm').textContent = "加入我的美食地圖";
+            document.getElementById('btnCancelEdit').style.display = "none";
+            document.getElementById('formHoursContainer').style.display = 'none';
+            switchTab('list');
+        }
+
+        async function saveData() {
+            lastSyncTimestamp = Date.now();
+            saveDataLocalOnly();
+            if (firebaseInitialized && db && currentRoomCode && firebaseUser) {
+                try {
+                    const safeName = getSafeBasketName(currentRoomCode);
+                    const roomDocRef = doc(db, 'public_rooms', safeName);
+                    await setDoc(roomDocRef, { restaurantsList: JSON.stringify(restaurants), timestamp: lastSyncTimestamp, lastModifiedBy: firebaseUser.uid });
+                } catch (e) { saveDataLocalOnly(); }
+            }
+        }
+
+        function saveDataLocalOnly() {
+            const codeKey = currentRoomCode ? currentRoomCode : 'local_standalone';
+            localStorage.setItem('myFoodMap_' + getSafeBasketName(codeKey), JSON.stringify(restaurants));
+            localStorage.setItem('myFoodMap_timestamp_' + getSafeBasketName(codeKey), lastSyncTimestamp);
+            updateDistrictDropdown();
+        }
+
+        function clearForm() {
+            document.getElementById('restName').value = ''; document.getElementById('restStyle').value = '';
+            document.getElementById('restDistrict').value = ''; document.getElementById('restNotes').value = '';
+            document.getElementById('restDelivery').checked = false; document.getElementById('restMapUrl').value = '';
+            document.querySelectorAll('.week-hours-input input').forEach(input => input.value = '');
+        }
+
+        function deleteRestaurant(id, event) {
+            event.stopPropagation();
+            const rest = restaurants.find(item => item.id === id);
+            if (!rest) return;
+            showConfirmModal('確定刪除', `您確定要把「${rest.name}」從美食地圖中刪除嗎？`, function() {
+                restaurants = restaurants.filter(item => item.id !== id);
+                saveData(); renderList(); showToast('已將商家刪除！');
+                if (editingId === id) cancelEditMode();
+                document.getElementById('mapPanel').innerHTML = `<div class="map-placeholder"><h2>歡迎使用美食地圖</h2><p style="margin-top:10px;">請在左側點選餐廳，右側將會精準顯現地圖畫面</p></div>`;
+            });
+        }
+
+        function toggleHours(id, event) {
+            event.stopPropagation();
+            const detailDiv = document.getElementById(`hours-${id}`);
+            const btn = event.currentTarget;
+            if (detailDiv.style.display === 'block') { detailDiv.style.display = 'none'; btn.innerHTML = '查看一週營業時間 ▾'; }
+            else { detailDiv.style.display = 'block'; btn.innerHTML = '收合營業時間 ▴'; }
+        }
+
+        function selectRestaurant(id, element) {
+            document.querySelectorAll('.restaurant-item').forEach(item => item.classList.remove('active'));
+            element.classList.add('active');
+            const rest = restaurants.find(item => item.id === id);
+            if (rest && rest.mapUrl) {
+                let finalMapSrc = rest.mapUrl;
+                if (rest.mapUrl.includes('google.com') && !rest.mapUrl.includes('output=embed')) {
+                    finalMapSrc = `https://maps.google.com/maps?q=${encodeURIComponent(rest.name)}&output=embed`;
+                }
+                document.getElementById('mapPanel').innerHTML = `<iframe src="${finalMapSrc}" allowfullscreen="" loading="lazy"></iframe>`;
+            } else if (rest) {
+                document.getElementById('mapPanel').innerHTML = `<iframe src="https://maps.google.com/maps?q=${encodeURIComponent(rest.name)}&output=embed" allowfullscreen="" loading="lazy"></iframe>`;
+            }
+        }
+
+        function renderList() {
+            const filterTime = document.getElementById('filterTime').value;
+            const filterDistrict = document.getElementById('filterDistrict').value;
+            const searchKeyword = document.getElementById('searchKeyword').value.toLowerCase();
+            const listContainer = document.getElementById('restaurantList');
+            listContainer.innerHTML = '';
+            const filtered = restaurants.filter(item => {
+                const matchTime = filterTime === '' || item.timeSlot === filterTime;
+                const matchDistrict = filterDistrict === '' || item.district === filterDistrict;
+                const itemNotes = item.notes || "";
+                const matchKeyword = item.name.toLowerCase().includes(searchKeyword) || item.style.toLowerCase().includes(searchKeyword) || item.district.toLowerCase().includes(searchKeyword) || itemNotes.toLowerCase().includes(searchKeyword);
+                return matchTime && matchDistrict && matchKeyword;
+            });
+            if (filtered.length === 0) { listContainer.innerHTML = '<p style="text-align:center; color:#999; padding:40px 20px;">目前清單是空的喔！快在隔壁新增商家吧！</p>'; return; }
+            filtered.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'restaurant-item';
+                itemDiv.onclick = function() { selectRestaurant(item.id, this); };
+                const deliveryHtml = item.hasDelivery ? `<span class="badge badge-delivery">M 支援外送</span>` : '';
+                const notesHtml = item.notes ? `<div class="item-notes">📝 ${item.notes}</div>` : '';
+                itemDiv.innerHTML = `
+                    <div class="item-title"><span>${item.name}</span><span class="rating-stars">★ ${item.rating}</span></div>
+                    <div class="item-meta"><span class="badge">${item.timeSlot}</span><span class="badge badge-style">${item.style}</span><span class="badge badge-district">📍 ${item.district}</span>${deliveryHtml}</div>
+                    ${notesHtml}
+                    <button class="hours-toggle-btn" onclick="toggleHours(${item.id}, event)">查看一週營業時間 ▾</button>
+                    <div class="item-hours-detail" id="hours-${item.id}">
+                        <div><span>星期一：</span><span>${item.hours.mon}</span></div><div><span>星期二：</span><span>${item.hours.tue}</span></div><div><span>星期三：</span><span>${item.hours.wed}</span></div><div><span>星期四：</span><span>${item.hours.thu}</span></div><div><span>星期五：</span><span>${item.hours.fri}</span></div><div><span>星期六：</span><span>${item.hours.sat}</span></div><div><span>星期日：</span><span>${item.hours.sun}</span></div>
+                    </div>
+                    <div class="item-actions"><button class="btn-action btn-action-edit" onclick="startEditRestaurant(${item.id}, event)">✏️ 編輯</button><button class="btn-action btn-action-delete" onclick="deleteRestaurant(${item.id}, event)">🗑️ 刪除</button></div>
+                `;
+                listContainer.appendChild(itemDiv);
+            });
+        }
+
+        function connectToCloud(manualCode = null) {
+            let code = manualCode || document.getElementById('shareCodeInput').value.trim();
+            if (!code) { showToast('請先輸入自訂的共享暗號喔！'); return; }
+            if (!firebaseInitialized || !db) { toggleCustomKeyConfig(true); showToast('🔑 尚未設定「Google 雲端金鑰」喔！請參考下方教學設定。'); return; }
+            
+            code = code.trim();
+            currentRoomCode = code;
+            
+            loadLocalDataForRoom(code);
+
+            showToast('📡 正在連線 Google 官方 Firebase 高速通道...');
+            document.getElementById('syncStatusText').innerHTML = `🟡 正在與 Google 同步中...`;
+
+            try {
+                if (unsubscribeListener) { unsubscribeListener(); unsubscribeListener = null; }
+                if (window.location.hash.substring(1) !== encodeURIComponent(code)) { window.location.hash = encodeURIComponent(code); }
+                localStorage.setItem('foodMap_shareCode', code);
+
+                const safeName = getSafeBasketName(code);
+                const roomDocRef = doc(db, 'public_rooms', safeName);
+
+                unsubscribeListener = onSnapshot(roomDocRef, (docSnap) => {
+                    if (docSnap.exists()) {
+                        const cloudData = docSnap.data();
+                        if (cloudData && cloudData.restaurantsList) {
+                            try {
+                                const cloudList = JSON.parse(cloudData.restaurantsList);
+                                if (cloudData.timestamp > lastSyncTimestamp) {
+                                    restaurants = cloudList;
+                                    lastSyncTimestamp = cloudData.timestamp;
+                                    saveDataLocalOnly();
+                                    renderList();
+                                    updateDistrictDropdown();
+                                    showToast("✨ 雲端同步成功！資料已即時更新！");
+                                }
+                            } catch (e) {}
+                        }
+                    } else {
+                        setDoc(roomDocRef, { restaurantsList: JSON.stringify(restaurants), timestamp: Date.now(), lastModifiedBy: firebaseUser ? firebaseUser.uid : 'anonymous' });
+                    }
+                    document.getElementById('syncStatusText').innerHTML = `🟢 雲端已同步 (代碼: <strong style="color:#0066cc;">${code}</strong>)`;
+                    document.getElementById('btnDisconnect').style.display = 'inline-block';
+                    document.getElementById('syncInputGroup').style.display = 'none';
+                    document.getElementById('syncActionRow').style.display = 'flex';
+                }, (error) => {
+                    document.getElementById('syncStatusText').innerHTML = `🔴 連線失敗`;
+                });
+            } catch (err) { document.getElementById('syncStatusText').innerHTML = `🔴 連線失敗`; }
+        }
+
+        function pullDataFromCloud(isManual = false) {
+            if (isManual && currentRoomCode) { showToast("🔄 正在向 Google 雲端對齊最新資料..."); connectToCloud(currentRoomCode); }
+        }
+
+        function copyShareLink() {
+            const code = currentRoomCode || localStorage.getItem('foodMap_shareCode');
+            if (!code) return;
+            const baseUrl = window.location.href.split('#')[0];
+            const shareUrl = `${baseUrl}#${encodeURIComponent(code)}`;
+            const tempInput = document.createElement('input'); tempInput.value = shareUrl; document.body.appendChild(tempInput); tempInput.select(); document.execCommand('copy'); document.body.removeChild(tempInput);
+            showToast('📋 連結複製成功！快傳給好友，大家點開就會自動連線喔！');
+        }
+
+        function disconnectCloud() {
+            if (unsubscribeListener) { unsubscribeListener(); unsubscribeListener = null; }
+            window.location.hash = '';
+            localStorage.removeItem('foodMap_shareCode');
+            currentRoomCode = null;
+            document.getElementById('shareCodeInput').value = '';
+            document.getElementById('syncStatusText').innerHTML = `⚫ 單機保存模式`;
+            document.getElementById('btnDisconnect').style.display = 'none';
+            document.getElementById('syncInputGroup').style.display = 'flex';
+            document.getElementById('syncActionRow').style.display = 'none';
+            document.getElementById('keyConfigBox').style.display = 'none';
+            if (!firebaseInitialized) document.getElementById('setupGuideBanner').style.display = 'flex';
+            loadLocalDataForRoom('local_standalone');
+            showToast('已回到單機保存模式。');
+        }
+
+        function toggleCustomKeyConfig(forceOpen = false) {
+            const box = document.getElementById('keyConfigBox');
+            if (forceOpen || box.style.display === 'none' || !box.style.display) {
+                box.style.display = 'flex';
+                document.getElementById('customFirebaseConfigInput').value = localStorage.getItem('foodMap_customFirebaseConfig') || '';
+                box.scrollIntoView({ behavior: 'smooth' });
+            } else { box.style.display = 'none'; }
+        }
+
+        function parseFirebaseConfig(input) {
+            try { return JSON.parse(input.trim().replace(/;$/, '')); }
+            catch (e) {
+                const config = {};
+                const keys = ['apiKey', 'authDomain', 'projectId', 'storageBucket', 'messagingSenderId', 'appId', 'measurementId'];
+                keys.forEach(key => {
+                    const regex = new RegExp(`['"]?${key}['"]?\\s*:\\s*['"]([^'"]+)['"]`);
+                    const match = input.match(regex);
+                    if (match && match[1]) config[key] = match[1].trim();
+                });
+                if (config.apiKey && config.projectId) return config;
+                return null;
+            }
+        }
+
+        function saveCustomFirebaseConfig() {
+            const input = document.getElementById('customFirebaseConfigInput').value.trim();
+            if (!input) { localStorage.removeItem('foodMap_customFirebaseConfig'); }
+            else {
+                const parsedConfig = parseFirebaseConfig(input);
+                if (parsedConfig) { localStorage.setItem('foodMap_customFirebaseConfig', JSON.stringify(parsedConfig)); showToast('⚙️ 金鑰設定成功，重新連線中...'); }
+                else { showToast('❌ 偵測不到有效的 Google 金鑰！'); return; }
+            }
+            document.getElementById('keyConfigBox').style.display = 'none';
+            initFirebase();
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            upgradeOldData();
+            initFirebase();
+            document.getElementById('deliveryContainer').addEventListener('click', function(e) {
+                const checkbox = document.getElementById('restDelivery');
+                if (checkbox && e.target !== checkbox) checkbox.checked = !checkbox.checked;
+            });
+        });
+
+        window.switchTab = switchTab; window.toggleFormHours = toggleFormHours; window.handleSubmit = handleSubmit;
+        window.startEditRestaurant = startEditRestaurant; window.cancelEditMode = cancelEditMode;
+        window.deleteRestaurant = deleteRestaurant; window.toggleHours = toggleHours;
+        window.connectToCloud = connectToCloud; window.disconnectCloud = disconnectCloud;
+        window.copyShareLink = copyShareLink; window.closeConfirmModal = closeConfirmModal;
+        window.pullDataFromCloud = pullDataFromCloud; window.toggleCustomKeyConfig = toggleCustomKeyConfig;
+        window.saveCustomFirebaseConfig = saveCustomFirebaseConfig;
+    </script>
+</body>
+</html>
