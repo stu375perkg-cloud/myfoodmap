@@ -434,6 +434,27 @@
             gap: 8px;
         }
 
+        /* 美作精美搜尋按鈕 */
+        .btn-search {
+            background-color: #1a1a1a;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background-color 0.2s;
+            white-space: nowrap;
+        }
+
+        .btn-search:hover {
+            background-color: #333333;
+        }
+
         /* 美食清單列表 */
         .restaurant-list {
             flex: 1;
@@ -767,20 +788,25 @@
 
         <div class="tab-content">
             <div id="pane-list" class="tab-pane active">
+                <!-- 🌟 升級的交叉篩選面板 -->
                 <div class="filter-container">
                     <div class="form-row">
-                        <select id="filterTime" onchange="renderList()" style="flex: 1;">
+                        <select id="filterTime" style="flex: 1;">
                             <option value="">全部時段</option>
                             <option value="早餐">早餐</option>
                             <option value="午餐">午餐</option>
                             <option value="晚餐">晚餐</option>
                             <option value="點心宵夜">點心宵夜</option>
                         </select>
-                        <select id="filterDistrict" onchange="renderList()" style="flex: 1;">
+                        <select id="filterDistrict" style="flex: 1;">
                             <option value="">全部地區</option>
                         </select>
                     </div>
-                    <input type="text" id="searchKeyword" placeholder="搜尋店名、風格、地區、備註..." oninput="renderList()">
+                    <div class="form-row" style="gap: 8px; align-items: center;">
+                        <input type="text" id="searchKeyword" placeholder="搜尋店名、風格、地區、備註..." style="flex: 1;">
+                        <!-- 🔍 點選後即時對時篩選 -->
+                        <button class="btn-search" onclick="renderList()">🔍 搜尋</button>
+                    </div>
                 </div>
                 <div class="restaurant-list" id="restaurantList"></div>
             </div>
@@ -1206,20 +1232,37 @@
             }
         }
 
+        // 🌟 核心交叉（重疊）篩選邏輯，並且在全域綁定後，保證點擊搜尋按鈕時完美套用！
         function renderList() {
             const filterTime = document.getElementById('filterTime').value;
             const filterDistrict = document.getElementById('filterDistrict').value;
             const searchKeyword = document.getElementById('searchKeyword').value.toLowerCase();
             const listContainer = document.getElementById('restaurantList');
             listContainer.innerHTML = '';
+            
             const filtered = restaurants.filter(item => {
+                // 晚餐選取時：只有 item.timeSlot === "晚餐" 為 true (對齊交集條件)
                 const matchTime = filterTime === '' || item.timeSlot === filterTime;
+                
+                // 地區選取時：只有 item.district === "大園區" 為 true (對齊交集條件)
                 const matchDistrict = filterDistrict === '' || item.district === filterDistrict;
+                
                 const itemNotes = item.notes || "";
-                const matchKeyword = item.name.toLowerCase().includes(searchKeyword) || item.style.toLowerCase().includes(searchKeyword) || item.district.toLowerCase().includes(searchKeyword) || itemNotes.toLowerCase().includes(searchKeyword);
+                const matchKeyword = searchKeyword === '' || 
+                                     item.name.toLowerCase().includes(searchKeyword) || 
+                                     item.style.toLowerCase().includes(searchKeyword) || 
+                                     item.district.toLowerCase().includes(searchKeyword) || 
+                                     itemNotes.toLowerCase().includes(searchKeyword);
+                
+                // 必須「時段重疊」且「地區重疊」且「關鍵字符合」才會回傳，此為 100% 嚴格交叉 (Intersection) 邏輯！
                 return matchTime && matchDistrict && matchKeyword;
             });
-            if (filtered.length === 0) { listContainer.innerHTML = '<p style="text-align:center; color:#999; padding:40px 20px;">目前清單是空的喔！快在隔壁新增商家吧！</p>'; return; }
+
+            if (filtered.length === 0) { 
+                listContainer.innerHTML = '<p style="text-align:center; color:#999; padding:40px 20px;">目前此重疊條件下沒有相符的美食喔！</p>'; 
+                return; 
+            }
+            
             filtered.forEach(item => {
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'restaurant-item';
@@ -1364,6 +1407,7 @@
             });
         });
 
+        // 🌟 將 renderList 確實註冊到全域，確保 HTML 中的「搜尋」按鈕可以 100% 成功執行
         window.switchTab = switchTab; window.toggleFormHours = toggleFormHours; window.handleSubmit = handleSubmit;
         window.startEditRestaurant = startEditRestaurant; window.cancelEditMode = cancelEditMode;
         window.deleteRestaurant = deleteRestaurant; window.toggleHours = toggleHours;
@@ -1371,6 +1415,7 @@
         window.copyShareLink = copyShareLink; window.closeConfirmModal = closeConfirmModal;
         window.pullDataFromCloud = pullDataFromCloud; window.toggleCustomKeyConfig = toggleCustomKeyConfig;
         window.saveCustomFirebaseConfig = saveCustomFirebaseConfig;
+        window.renderList = renderList;
     </script>
 </body>
 </html>
