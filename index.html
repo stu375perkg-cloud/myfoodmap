@@ -620,6 +620,10 @@
             margin-bottom: 4px;
         }
 
+        .item-hours-detail div:last-child {
+            margin-bottom: 0;
+        }
+
         .item-actions {
             display: flex;
             justify-content: flex-end;
@@ -779,7 +783,7 @@
             <div class="sync-action-row" id="syncActionRow" style="display: none;">
                 <div class="sync-button-group">
                     <button class="btn-copy-link" onclick="copyShareLink()">
-                        📋 複製專屬分享連結給好友
+                        📋 複製好友專屬分享連結
                     </button>
                     <button class="btn-custom-key" onclick="toggleCustomKeyConfig()">
                         ⚙️ 自訂 Google 雲端金鑰
@@ -1550,8 +1554,11 @@
                 const cb = label.querySelector('input[type="checkbox"]');
                 if (cb) {
                     cb.addEventListener('change', function() {
-                        if (this.checked) label.classList.add('checked');
-                        else label.classList.remove('checked');
+                        if (this.checked) {
+                            label.classList.add('checked');
+                        } else {
+                            label.classList.remove('checked');
+                        }
                     });
                 }
             });
