@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的專屬美食地圖資料庫 - Google 雲端共享版</title>
+    <title>我的專屬美食地圖資料庫 - 雲端即時共享版</title>
     <style>
         /* 基礎樣式設定 */
         * {
@@ -206,6 +206,48 @@
         .guide-step {
             margin-bottom: 8px;
             line-height: 1.4;
+        }
+
+        /* Checkbox 複選框組樣式 */
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 5px;
+        }
+
+        .checkbox-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background-color: #f1f3f5;
+            border: 1px solid #ced4da;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #495057;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .checkbox-item:hover {
+            background-color: #e9ecef;
+            border-color: #adb5bd;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+            cursor: pointer;
+            accent-color: #1a1a1a;
+        }
+
+        .checkbox-item.checked {
+            background-color: #1a1a1a;
+            color: #ffffff;
+            border-color: #1a1a1a;
         }
 
         /* 分頁標籤樣式 */
@@ -433,26 +475,12 @@
             flex-direction: column;
             gap: 8px;
         }
-
-        /* 美作精美搜尋按鈕 */
-        .btn-search {
-            background-color: #1a1a1a;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 13px;
+        
+        .filter-title {
+            font-size: 12px;
             font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: background-color 0.2s;
-            white-space: nowrap;
-        }
-
-        .btn-search:hover {
-            background-color: #333333;
+            color: #495057;
+            margin-top: 2px;
         }
 
         /* 美食清單列表 */
@@ -519,6 +547,7 @@
             color: #ffffff;
             border-radius: 4px;
             font-weight: bold;
+            margin-right: 4px;
         }
 
         .badge-style {
@@ -741,6 +770,7 @@
                 <button class="btn-sync-connect" onclick="connectToCloud()">連線同步</button>
             </div>
 
+            <!-- 手把手雲端設定引導 -->
             <div class="setup-guide-banner" id="setupGuideBanner" onclick="toggleCustomKeyConfig()">
                 <span>💡 想要與大家即時共編嗎？點此開啟「2 分鐘免費雲端設定」！</span>
                 <button style="background: #f59f00; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; white-space: nowrap; margin-left: 10px;">去設定</button>
@@ -788,25 +818,24 @@
 
         <div class="tab-content">
             <div id="pane-list" class="tab-pane active">
-                <!-- 🌟 升級的交叉篩選面板 -->
                 <div class="filter-container">
-                    <div class="form-row">
-                        <select id="filterTime" style="flex: 1;">
-                            <option value="">全部時段</option>
-                            <option value="早餐">早餐</option>
-                            <option value="午餐">午餐</option>
-                            <option value="晚餐">晚餐</option>
-                            <option value="點心宵夜">點心宵夜</option>
-                        </select>
-                        <select id="filterDistrict" style="flex: 1;">
-                            <option value="">全部地區</option>
-                        </select>
+                    <div class="filter-title">篩選用餐時段 (可多選)：</div>
+                    <!-- 複選時段按鈕 -->
+                    <div class="checkbox-group" id="filterTime">
+                        <label class="checkbox-item"><input type="checkbox" value="早餐"> 早餐</label>
+                        <label class="checkbox-item"><input type="checkbox" value="午餐"> 午餐</label>
+                        <label class="checkbox-item"><input type="checkbox" value="晚餐"> 晚餐</label>
+                        <label class="checkbox-item"><input type="checkbox" value="點心宵夜"> 點心宵夜</label>
                     </div>
-                    <div class="form-row" style="gap: 8px; align-items: center;">
-                        <input type="text" id="searchKeyword" placeholder="搜尋店名、風格、地區、備註..." style="flex: 1;">
-                        <!-- 🔍 點選後即時對時篩選 -->
-                        <button class="btn-search" onclick="renderList()">🔍 搜尋</button>
-                    </div>
+                    
+                    <div class="filter-title">篩選地區 (可多選)：</div>
+                    <!-- 複選地區動態按鈕 -->
+                    <div class="checkbox-group" id="filterDistrict"></div>
+                    
+                    <input type="text" id="searchKeyword" placeholder="搜尋店名、風格、地區、備註..." style="margin-top: 5px;">
+                    
+                    <!-- 新增實體搜尋按鈕，防止罷工並實現精準 AND 交集重疊篩選 -->
+                    <button class="btn-submit" onclick="renderList()" style="margin-top: 5px; background-color: #1a1a1a;">🔍 開始搜尋</button>
                 </div>
                 <div class="restaurant-list" id="restaurantList"></div>
             </div>
@@ -820,38 +849,39 @@
                         <input type="text" id="restName" placeholder="例如：古早味煎餃 粉漿蛋餅">
                     </div>
                     
-                    <div class="form-row">
-                        <div class="form-group" style="flex: 1;">
-                            <label>用餐時段</label>
-                            <select id="restTimeSlot">
-                                <option value="早餐">早餐</option>
-                                <option value="午餐" selected>午餐</option>
-                                <option value="晚餐">晚餐</option>
-                                <option value="點心宵夜">點心宵夜</option>
-                            </select>
+                    <div class="form-group">
+                        <!-- 用餐時段全面升級為多選框 -->
+                        <label>用餐時段 (可多選) *</label>
+                        <div class="checkbox-group" id="restTimeSlot">
+                            <label class="checkbox-item"><input type="checkbox" value="早餐"> 早餐</label>
+                            <label class="checkbox-item"><input type="checkbox" value="午餐"> 午餐</label>
+                            <label class="checkbox-item"><input type="checkbox" value="晚餐"> 晚餐</label>
+                            <label class="checkbox-item"><input type="checkbox" value="點心宵夜"> 點心宵夜</label>
                         </div>
+                    </div>
+
+                    <div class="form-row">
                         <div class="form-group" style="flex: 1;">
                             <label>餐廳風格</label>
                             <input type="text" id="restStyle" placeholder="如：早餐店、泰式料理、拉麵">
                         </div>
-                    </div>
-
-                    <div class="form-row">
                         <div class="form-group" style="flex: 1;">
                             <label>所在地區</label>
                             <input type="text" id="restDistrict" placeholder="如：大園區、五股區">
                         </div>
+                    </div>
+
+                    <div class="form-row">
                         <div class="form-group" style="flex: 1;">
                             <label>Google 評分 (1~5)</label>
                             <input type="number" id="restRating" min="1" max="5" step="0.1" value="4.5">
                         </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>外送服務</label>
-                        <div class="delivery-checkbox-container" id="deliveryContainer">
-                            <input type="checkbox" id="restDelivery">
-                            <span>🛵 提供外送服務 / 平台合作</span>
+                        <div class="form-group" style="flex: 1;">
+                            <label>外送服務</label>
+                            <div class="delivery-checkbox-container" id="deliveryContainer" style="height: 38px; display: flex; align-items: center;">
+                                <input type="checkbox" id="restDelivery" style="width: auto; margin-right: 6px;">
+                                <span style="font-size: 13px; font-weight: bold; color: #495057;">🛵 提供外送服務 / 平台合作</span>
+                            </div>
                         </div>
                     </div>
 
@@ -924,7 +954,7 @@
             {
                 id: 1,
                 name: "古早味煎餃 粉漿蛋餅 (範例項目)",
-                timeSlot: "早餐",
+                timeSlots: ["早餐", "午餐"],
                 style: "古早味早餐",
                 district: "大園區",
                 rating: "4.5",
@@ -948,10 +978,21 @@
             return 'box_' + hex;
         }
 
-        // 智慧升級：將舊欄位補齊，並修復「地區與風格」拆分
+        // 智慧升級：修補並自動相容舊版單一字串 timeSlot，無痛轉化為陣列
         function upgradeOldData() {
             let hasUpgraded = false;
             restaurants.forEach(item => {
+                // 1. 若只有舊版字串，無痛轉化為多選陣列
+                if (item.timeSlot && !item.timeSlots) {
+                    item.timeSlots = [item.timeSlot];
+                    hasUpgraded = true;
+                }
+                if (!item.timeSlots) {
+                    item.timeSlots = ["午餐"];
+                    hasUpgraded = true;
+                }
+                
+                // 2. 風格與地區分離
                 if (item.district === undefined) {
                     if (item.style && item.style.includes('/')) {
                         const parts = item.style.split('/');
@@ -1028,6 +1069,7 @@
             restaurants = JSON.parse(localStorage.getItem(key)) || defaultTemplate;
             lastSyncTimestamp = parseInt(localStorage.getItem(timeKey)) || 0;
             
+            upgradeOldData();
             updateDistrictDropdown();
             renderList();
         }
@@ -1073,20 +1115,40 @@
 
         function closeConfirmModal() { document.getElementById('confirmModal').style.display = 'none'; }
 
+        // 🌟 地區動態生成為多選核取藥丸
         function updateDistrictDropdown() {
-            const dropdown = document.getElementById('filterDistrict');
-            if (!dropdown) return;
+            const container = document.getElementById('filterDistrict');
+            if (!container) return;
+            
             const districts = [...new Set(restaurants.map(r => r.district).filter(d => d && d !== "未填寫" && d !== ""))];
-            dropdown.innerHTML = '<option value="">全部地區</option>';
+            container.innerHTML = '';
+            
+            if (districts.length === 0) {
+                container.innerHTML = '<span style="color:#999; font-size:12px;">尚未有地區標籤，請先新增商家。</span>';
+                return;
+            }
+
             districts.forEach(dist => {
-                const opt = document.createElement('option');
-                opt.value = dist; opt.textContent = dist; dropdown.appendChild(opt);
+                const label = document.createElement('label');
+                label.className = 'checkbox-item';
+                label.innerHTML = `<input type="checkbox" value="${dist}"> ${dist}`;
+                
+                // 動態綁定變色手勢
+                label.querySelector('input').addEventListener('change', function() {
+                    if (this.checked) {
+                        label.classList.add('checked');
+                    } else {
+                        label.classList.remove('checked');
+                    }
+                });
+                
+                container.appendChild(label);
             });
         }
 
+        // 送出新增 / 修改
         function handleSubmit() {
             const name = document.getElementById('restName').value.trim();
-            const timeSlot = document.getElementById('restTimeSlot').value;
             const style = document.getElementById('restStyle').value.trim() || "未分類";
             const district = document.getElementById('restDistrict').value.trim() || "未填寫";
             const rating = document.getElementById('restRating').value.trim() || "5.0";
@@ -1095,6 +1157,17 @@
             let mapUrl = document.getElementById('restMapUrl').value.trim();
 
             if (!name) { showToast('請填寫餐廳名稱喔！'); return; }
+
+            // 1. 搜集複選時段
+            const selectedTimeSlots = [];
+            document.querySelectorAll('#restTimeSlot input:checked').forEach(cb => {
+                selectedTimeSlots.push(cb.value);
+            });
+
+            if (selectedTimeSlots.length === 0) {
+                showToast('請至少勾選一個用餐時段喔！');
+                return;
+            }
 
             const hoursData = {
                 mon: document.getElementById('h-mon').value.trim() || "未填寫",
@@ -1109,35 +1182,60 @@
             if (editingId !== null) {
                 const index = restaurants.findIndex(item => item.id === editingId);
                 if (index !== -1) {
-                    restaurants[index].name = name; restaurants[index].timeSlot = timeSlot;
-                    restaurants[index].style = style; restaurants[index].district = district;
-                    restaurants[index].rating = rating; restaurants[index].hasDelivery = hasDelivery;
-                    restaurants[index].notes = notes; restaurants[index].mapUrl = mapUrl;
+                    restaurants[index].name = name; 
+                    restaurants[index].timeSlots = selectedTimeSlots;
+                    restaurants[index].style = style; 
+                    restaurants[index].district = district;
+                    restaurants[index].rating = rating; 
+                    restaurants[index].hasDelivery = hasDelivery;
+                    restaurants[index].notes = notes; 
+                    restaurants[index].mapUrl = mapUrl;
                     restaurants[index].hours = hoursData;
-                    saveData(); showToast('商家資訊修改成功！'); cancelEditMode(); renderList(); switchTab('list');
+                    
+                    saveData(); 
+                    showToast('商家資訊修改成功！'); 
+                    cancelEditMode(); 
+                    renderList(); 
+                    switchTab('list');
                 }
             } else {
                 const newRest = {
-                    id: Date.now(), name: name, timeSlot: timeSlot, style: style, district: district,
-                    rating: rating, hasDelivery: hasDelivery, notes: notes, mapUrl: mapUrl, hours: hoursData
+                    id: Date.now(), 
+                    name: name, 
+                    timeSlots: selectedTimeSlots, 
+                    style: style, 
+                    district: district,
+                    rating: rating, 
+                    hasDelivery: hasDelivery, 
+                    notes: notes, 
+                    mapUrl: mapUrl, 
+                    hours: hoursData
                 };
-                restaurants.push(newRest); saveData(); showToast('成功加入美食地圖！'); clearForm(); renderList(); switchTab('list');
+                restaurants.push(newRest); 
+                saveData(); 
+                showToast('成功加入美食地圖！'); 
+                clearForm(); 
+                renderList(); 
+                switchTab('list');
             }
         }
 
+        // 啟動編輯模式
         function startEditRestaurant(id, event) {
             event.stopPropagation();
             const rest = restaurants.find(item => item.id === id);
             if (!rest) return;
             editingId = id;
+            
             document.getElementById('restName').value = rest.name;
-            document.getElementById('restTimeSlot').value = rest.timeSlot;
             document.getElementById('restStyle').value = rest.style === "未分類" ? "" : rest.style;
             document.getElementById('restDistrict').value = rest.district === "未填寫" ? "" : rest.district;
             document.getElementById('restRating').value = rest.rating;
             document.getElementById('restDelivery').checked = rest.hasDelivery || false;
             document.getElementById('restMapUrl').value = rest.mapUrl;
             document.getElementById('restNotes').value = rest.notes || "";
+            
+            // 恢復營業時間
             document.getElementById('h-mon').value = rest.hours.mon === "未填寫" ? "" : rest.hours.mon;
             document.getElementById('h-tue').value = rest.hours.tue === "未填寫" ? "" : rest.hours.tue;
             document.getElementById('h-wed').value = rest.hours.wed === "未填寫" ? "" : rest.hours.wed;
@@ -1145,6 +1243,22 @@
             document.getElementById('h-fri').value = rest.hours.fri === "未填寫" ? "" : rest.hours.fri;
             document.getElementById('h-sat').value = rest.hours.sat === "未填寫" ? "" : rest.hours.sat;
             document.getElementById('h-sun').value = rest.hours.sun === "未填寫" ? "" : rest.hours.sun;
+            
+            // 重設並勾選對應的時段 Checkbox
+            document.querySelectorAll('#restTimeSlot input').forEach(cb => {
+                cb.checked = false;
+                cb.parentElement.classList.remove('checked');
+            });
+            if (rest.timeSlots) {
+                rest.timeSlots.forEach(t => {
+                    const cb = document.querySelector(`#restTimeSlot input[value="${t}"]`);
+                    if (cb) {
+                        cb.checked = true;
+                        cb.parentElement.classList.add('checked');
+                    }
+                });
+            }
+
             document.getElementById('formPanelTitle').innerHTML = `✏️ 正在修改：<span style="color: #0066cc;">${rest.name}</span>`;
             document.getElementById('btnSubmitForm').textContent = "儲存修改";
             document.getElementById('btnCancelEdit').style.display = "block";
@@ -1153,7 +1267,8 @@
         }
 
         function cancelEditMode() {
-            editingId = null; clearForm();
+            editingId = null; 
+            clearForm();
             document.getElementById('formPanelTitle').textContent = "新增美食商家資訊";
             document.getElementById('btnSubmitForm').textContent = "加入我的美食地圖";
             document.getElementById('btnCancelEdit').style.display = "none";
@@ -1181,10 +1296,19 @@
         }
 
         function clearForm() {
-            document.getElementById('restName').value = ''; document.getElementById('restStyle').value = '';
-            document.getElementById('restDistrict').value = ''; document.getElementById('restNotes').value = '';
-            document.getElementById('restDelivery').checked = false; document.getElementById('restMapUrl').value = '';
+            document.getElementById('restName').value = ''; 
+            document.getElementById('restStyle').value = '';
+            document.getElementById('restDistrict').value = ''; 
+            document.getElementById('restNotes').value = '';
+            document.getElementById('restDelivery').checked = false; 
+            document.getElementById('restMapUrl').value = '';
             document.querySelectorAll('.week-hours-input input').forEach(input => input.value = '');
+            
+            // 清空時段勾選
+            document.querySelectorAll('#restTimeSlot input').forEach(cb => {
+                cb.checked = false;
+                cb.parentElement.classList.remove('checked');
+            });
         }
 
         function deleteRestaurant(id, event) {
@@ -1207,71 +1331,93 @@
             else { detailDiv.style.display = 'block'; btn.innerHTML = '收合營業時間 ▴'; }
         }
 
+        // 🌟 智慧萬用轉換與無阻擋導航地圖
         function selectRestaurant(id, element) {
             document.querySelectorAll('.restaurant-item').forEach(item => item.classList.remove('active'));
             element.classList.add('active');
             const rest = restaurants.find(item => item.id === id);
-            if (rest) {
-                let finalMapSrc = "";
-                let url = (rest.mapUrl || "").trim();
-                
-                if (url.includes('output=embed') || url.includes('/maps/embed')) {
-                    // 如果原本就是合法的官方內嵌網址，直接使用
-                    finalMapSrc = url;
-                } else if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
-                    // 如果使用者輸入的是純地址（非網址），直接用地址當關鍵字搜尋
-                    finalMapSrc = `https://maps.google.com/maps?q=${encodeURIComponent(url)}&output=embed`;
-                } else {
-                    // 🌟 核心修正：如果是 maps.app.goo.gl 這類的分享短網址或一般地圖網址，
-                    // Google 為了安全防禦，是不允許直接放進小窗戶 (iframe) 的（會顯示拒絕連線）。
-                    // 我們智慧地將其轉為官方許可的 Google 內嵌地圖，並精準搜尋「餐廳名稱 + 所在地區」，保證 100% 成功顯現！
-                    finalMapSrc = `https://maps.google.com/maps?q=${encodeURIComponent(rest.name + ' ' + rest.district)}&output=embed`;
-                }
-                
-                document.getElementById('mapPanel').innerHTML = `<iframe src="${finalMapSrc}" allowfullscreen="" loading="lazy"></iframe>`;
+            if (!rest) return;
+
+            let finalMapSrc = "";
+            const isGoogleUrl = rest.mapUrl && rest.mapUrl.includes("google.com/maps");
+
+            if (isGoogleUrl) {
+                // 如果是完整的 Google 地圖分享連結，在小窗戶會被阻擋
+                // 智慧轉化：提取餐廳名稱與地區，直接向 Google 地圖官方進行精準內嵌搜尋，100% 不會被安全警衛阻擋
+                const searchParam = encodeURIComponent(`${rest.name} ${rest.district}`);
+                finalMapSrc = `https://maps.google.com/maps?q=${searchParam}&output=embed`;
+            } else if (rest.mapUrl && (rest.mapUrl.startsWith("http://") || rest.mapUrl.startsWith("https://"))) {
+                // 其他自訂內嵌網址
+                finalMapSrc = rest.mapUrl;
+            } else {
+                // 若無網址，直接用「名字＋地區」進行萬用官方內嵌，體驗無比流暢！
+                const searchParam = encodeURIComponent(`${rest.name} ${rest.district}`);
+                finalMapSrc = `https://maps.google.com/maps?q=${searchParam}&output=embed`;
             }
+
+            document.getElementById('mapPanel').innerHTML = `<iframe src="${finalMapSrc}" allowfullscreen="" loading="lazy"></iframe>`;
         }
 
-        // 🌟 核心交叉（重疊）篩選邏輯，並且在全域綁定後，保證點擊搜尋按鈕時完美套用！
+        // 🌟 核心升級：100% 嚴格交叉 (AND) 重疊複選篩選邏輯
         function renderList() {
-            const filterTime = document.getElementById('filterTime').value;
-            const filterDistrict = document.getElementById('filterDistrict').value;
+            // 1. 取得勾選的篩選時段
+            const selectedTimes = [];
+            document.querySelectorAll('#filterTime input:checked').forEach(cb => {
+                selectedTimes.push(cb.value);
+            });
+
+            // 2. 取得勾選的篩選地區
+            const selectedDistricts = [];
+            document.querySelectorAll('#filterDistrict input:checked').forEach(cb => {
+                selectedDistricts.push(cb.value);
+            });
+
             const searchKeyword = document.getElementById('searchKeyword').value.toLowerCase();
             const listContainer = document.getElementById('restaurantList');
             listContainer.innerHTML = '';
-            
+
             const filtered = restaurants.filter(item => {
-                // 晚餐選取時：只有 item.timeSlot === "晚餐" 為 true (對齊交集條件)
-                const matchTime = filterTime === '' || item.timeSlot === filterTime;
+                // 用餐時段比對 (店家時段數組 item.timeSlots 必須與勾選時段 selectedTimes 有交集)
+                const matchTime = selectedTimes.length === 0 || selectedTimes.some(t => item.timeSlots.includes(t));
                 
-                // 地區選取時：只有 item.district === "大園區" 為 true (對齊交集條件)
-                const matchDistrict = filterDistrict === '' || item.district === filterDistrict;
+                // 地區比對 (店家地區 item.district 必須在勾選的地區數組中)
+                const matchDistrict = selectedDistricts.length === 0 || selectedDistricts.includes(item.district);
                 
+                // 關鍵字搜尋
                 const itemNotes = item.notes || "";
-                const matchKeyword = searchKeyword === '' || 
-                                     item.name.toLowerCase().includes(searchKeyword) || 
+                const matchKeyword = item.name.toLowerCase().includes(searchKeyword) || 
                                      item.style.toLowerCase().includes(searchKeyword) || 
                                      item.district.toLowerCase().includes(searchKeyword) || 
                                      itemNotes.toLowerCase().includes(searchKeyword);
                 
-                // 必須「時段重疊」且「地區重疊」且「關鍵字符合」才會回傳，此為 100% 嚴格交叉 (Intersection) 邏輯！
+                // 嚴格交集：時段條件符合 AND 地區條件符合 AND 關鍵字符合
                 return matchTime && matchDistrict && matchKeyword;
             });
 
             if (filtered.length === 0) { 
-                listContainer.innerHTML = '<p style="text-align:center; color:#999; padding:40px 20px;">目前此重疊條件下沒有相符的美食喔！</p>'; 
+                listContainer.innerHTML = '<p style="text-align:center; color:#999; padding:40px 20px;">找不到符合的餐廳喔！快在隔壁新增商家吧！</p>'; 
                 return; 
             }
-            
+
             filtered.forEach(item => {
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'restaurant-item';
                 itemDiv.onclick = function() { selectRestaurant(item.id, this); };
-                const deliveryHtml = item.hasDelivery ? `<span class="badge badge-delivery">M 支援外送</span>` : '';
+                
+                const deliveryHtml = item.hasDelivery ? `<span class="badge badge-delivery">🛵 支援外送</span>` : '';
                 const notesHtml = item.notes ? `<div class="item-notes">📝 ${item.notes}</div>` : '';
+                
+                // 用餐時段多選黑標章渲染
+                const timeBadgesHtml = item.timeSlots.map(t => `<span class="badge">${t}</span>`).join(' ');
+
                 itemDiv.innerHTML = `
                     <div class="item-title"><span>${item.name}</span><span class="rating-stars">★ ${item.rating}</span></div>
-                    <div class="item-meta"><span class="badge">${item.timeSlot}</span><span class="badge badge-style">${item.style}</span><span class="badge badge-district">📍 ${item.district}</span>${deliveryHtml}</div>
+                    <div class="item-meta">
+                        ${timeBadgesHtml}
+                        <span class="badge badge-style">${item.style}</span>
+                        <span class="badge badge-district">📍 ${item.district}</span>
+                        ${deliveryHtml}
+                    </div>
                     ${notesHtml}
                     <button class="hours-toggle-btn" onclick="toggleHours(${item.id}, event)">查看一週營業時間 ▾</button>
                     <div class="item-hours-detail" id="hours-${item.id}">
@@ -1316,7 +1462,7 @@
                                     saveDataLocalOnly();
                                     renderList();
                                     updateDistrictDropdown();
-                                    showToast("✨ 雲端同步成功！資料已即時更新！");
+                                    showToast("✨ Google 雲端同步成功！資料已即時更新！");
                                 }
                             } catch (e) {}
                         }
@@ -1398,16 +1544,36 @@
             initFirebase();
         }
 
+        // 綁定點選變色手勢（新增 / 篩選時段 Checkbox 點擊變黑底）
+        function setupPillsBehavior() {
+            document.querySelectorAll('.checkbox-item').forEach(label => {
+                const cb = label.querySelector('input[type="checkbox"]');
+                if (cb) {
+                    cb.addEventListener('change', function() {
+                        if (this.checked) label.classList.add('checked');
+                        else label.classList.remove('checked');
+                    });
+                }
+            });
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             upgradeOldData();
             initFirebase();
-            document.getElementById('deliveryContainer').addEventListener('click', function(e) {
-                const checkbox = document.getElementById('restDelivery');
-                if (checkbox && e.target !== checkbox) checkbox.checked = !checkbox.checked;
-            });
+            setupPillsBehavior();
+            
+            // 安全綁定外送勾選框點擊手勢
+            const deliveryContainer = document.getElementById('deliveryContainer');
+            if (deliveryContainer) {
+                deliveryContainer.addEventListener('click', function(e) {
+                    const checkbox = document.getElementById('restDelivery');
+                    if (checkbox && e.target !== checkbox) {
+                        checkbox.checked = !checkbox.checked;
+                    }
+                });
+            }
         });
 
-        // 🌟 將 renderList 確實註冊到全域，確保 HTML 中的「搜尋」按鈕可以 100% 成功執行
         window.switchTab = switchTab; window.toggleFormHours = toggleFormHours; window.handleSubmit = handleSubmit;
         window.startEditRestaurant = startEditRestaurant; window.cancelEditMode = cancelEditMode;
         window.deleteRestaurant = deleteRestaurant; window.toggleHours = toggleHours;
