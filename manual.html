@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我們的口袋美食地圖 - 共享共編使用說明書</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        .step-number {
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+
+    <!-- 頂部黑底大器標頭 -->
+    <header class="bg-zinc-900 text-white py-12 px-6 shadow-md relative overflow-hidden">
+        <div class="absolute inset-0 bg-grid-white/[0.05] bg-[size:20px_20px] pointer-events-none"></div>
+        <div class="max-w-4xl mx-auto text-center relative z-10">
+            <span class="bg-yellow-400 text-zinc-950 font-bold px-3 py-1 rounded-full text-xs uppercase tracking-wider mb-3 inline-block">使用者新手教學</span>
+            <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">我們的口袋美食地圖 🗺️</h1>
+            <p class="text-zinc-400 mt-2 text-sm md:text-base">手把手帶你打通 Google 雲端即時共編通道，與好友、家人、同事一起蓋大樓！</p>
+        </div>
+    </header>
+
+    <!-- 主內容區 -->
+    <main class="max-w-4xl mx-auto px-4 py-8 md:py-12">
+        
+        <!-- 導言框 -->
+        <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm mb-10">
+            <h2 class="text-lg font-bold text-zinc-900 flex items-center gap-2 mb-2">
+                <span>👋 哈囉！歡迎來到我們的專屬美食小天地！</span>
+            </h2>
+            <p class="text-slate-600 leading-relaxed text-sm md:text-base">
+                這款美食地圖是由大家共同擁有的<strong>「雲端美食基地」</strong>。無論你是為了辦公室下午茶、家庭聚餐還是死黨吃貨群而拿到這串網址，這本手冊都會用最白話、絕對沒有火星文的手把手教學，帶你在一分鐘內上手所有強大功能！
+            </p>
+        </div>
+
+        <!-- 單元一：雲端金鑰設定 -->
+        <section class="mb-12">
+            <div class="flex items-center gap-3 mb-6 border-b border-slate-200 pb-3">
+                <span class="bg-zinc-900 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">1</span>
+                <h2 class="text-xl font-bold text-zinc-900">手把手開啟 Google 共享大抽屜 (免花錢)</h2>
+            </div>
+            
+            <p class="text-slate-600 mb-6 text-sm md:text-base">
+                因為本網頁 100% 尊重個人隱私，所有的美食資料都存存放在你專屬的安全空間中。如果你是這個地圖的「創始管理員」，只要花 2 分鐘，就能向 Google 免費申請一個<strong>「專屬雲端共享大抽屜 (Firebase)」</strong>！
+            </p>
+
+            <!-- 步驟清單 -->
+            <div class="space-y-4">
+                <!-- 步驟 1-1 -->
+                <div class="flex gap-4 bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-blue-300 transition">
+                    <div class="text-blue-600 font-extrabold text-lg mt-0.5 select-none">A</div>
+                    <div>
+                        <h3 class="font-bold text-zinc-900 mb-1">打開 Google 官方 Firebase 網站</h3>
+                        <p class="text-slate-600 text-xs md:text-sm">
+                            用你的 Google 帳號，點擊並開啟 <a href="https://console.firebase.google.com/" target="_blank" class="text-blue-600 underline font-semibold hover:text-blue-800">Google Firebase 官方控制台 ↗</a>。點選「新增專案」，隨便取個名字（例如 `food` 或是 `my-food-map`），一直點選繼續，直到建立完成。
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 步驟 1-2 -->
+                <div class="flex gap-4 bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-blue-300 transition">
+                    <div class="text-blue-600 font-extrabold text-lg mt-0.5 select-none">B</div>
+                    <div>
+                        <h3 class="font-bold text-zinc-900 mb-1">註冊網頁，拿取雲端鑰匙 (Config)</h3>
+                        <p class="text-slate-600 text-xs md:text-sm mb-3">
+                            進入專案後，點選畫面中間像網頁符號的 <strong>「網頁 `</>`」</strong> 按鈕註冊。註冊後會跳出一大串程式碼，**不要慌張！請直接用滑鼠把大括號 `{` 到 `}` 裡面的內容全部複製起來**！
+                        </p>
+                        <!-- 程式碼範例對照圖 -->
+                        <div class="bg-zinc-900 text-zinc-400 p-3 rounded-lg text-xs font-mono max-w-md border border-zinc-700">
+                            const firebaseConfig = <span class="text-yellow-400 font-semibold">{</span><br>
+                            &nbsp;&nbsp;apiKey: "AIzaSy...",<br>
+                            &nbsp;&nbsp;authDomain: "...",<br>
+                            &nbsp;&nbsp;projectId: "..."<br>
+                            <span class="text-yellow-400 font-semibold">}</span>; <span class="text-zinc-500">// 👈 只複製黃色大括號裡的所有內容！</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 步驟 1-3 -->
+                <div class="flex gap-4 bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-blue-300 transition">
+                    <div class="text-blue-600 font-extrabold text-lg mt-0.5 select-none">C</div>
+                    <div>
+                        <h3 class="font-bold text-zinc-900 mb-1">解鎖雲端大門 (Firestore 與 Authentication)</h3>
+                        <p class="text-slate-600 text-xs md:text-sm">
+                            請在 Google 網頁左邊選單，點選 <strong>「Firestore Database」</strong> 建立資料庫，並務必選 **「以測試模式啟動」**；接著到左側點 <strong>「Authentication」</strong>，在「登入方法」中找到 **「匿名 (Anonymous)」** 並啟用儲存。這兩步就像是在雲端幫大家做了特製門票！
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 步驟 1-4 -->
+                <div class="flex gap-4 bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-blue-300 transition">
+                    <div class="text-blue-600 font-extrabold text-lg mt-0.5 select-none">D</div>
+                    <div>
+                        <h3 class="font-bold text-zinc-900 mb-1">將鑰匙貼回我們的美食地圖</h3>
+                        <p class="text-slate-600 text-xs md:text-sm">
+                            打開你們的美食地圖網址，點選最上方黃色橫幅的 <strong>「去設定」</strong>（或點灰色按鈕「⚙️ 自訂 Google 雲端金鑰」），在輸入框內**整段貼上剛剛複製的大括號內容**，按下「儲存並重連雲端」就搞定囉！
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 注意事項 -->
+            <div class="mt-4 bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-xl">
+                <p class="text-xs md:text-sm text-blue-800 leading-relaxed">
+                    💡 <strong>親友免設定：</strong> 管理員設定好金鑰並上傳更新網頁後，其他親朋好友只要直接點開分享網址，**就能完全免去上面所有的金鑰步驟**！他們直接進入下一步就能直接使用了，超級方便！
+                </p>
+            </div>
+        </section>
+
+        <!-- 單元二：共享暗號與獨立隔離 -->
+        <section class="mb-12">
+            <div class="flex items-center gap-3 mb-6 border-b border-slate-200 pb-3">
+                <span class="bg-zinc-900 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">2</span>
+                <h2 class="text-xl font-bold text-zinc-900">自訂共享暗號 (多帳號多房間隔離)</h2>
+            </div>
+            
+            <p class="text-slate-600 mb-6 text-sm md:text-base">
+                為了讓這個工具可以分給不同的群組使用（例如跟同事共享一本地圖、跟家人又共享另一本地圖），我們特別設計了<strong>「雲端虛擬包廂（共享暗號）」</strong>功能：
+            </p>
+
+            <!-- 圖解與運作方式 (採用 grid 杜絕任何寬度擠壓) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- 房號 A -->
+                <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm relative overflow-hidden flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-3 mb-3">
+                            <span class="text-2xl">🍕</span>
+                            <div>
+                                <h3 class="font-bold text-zinc-900">輸入暗號：公司下午茶</h3>
+                                <p class="text-xs text-slate-400">所有同事即時同步編輯</p>
+                            </div>
+                        </div>
+                        <div class="bg-slate-50 p-3 rounded-lg text-xs text-slate-500">
+                            這裡會顯示：金色三麥、星巴克、古早味煎餃等辦公室常訂的外送清單，**和家人代碼 100% 完美隔離，完全不會混在一起**！
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 房號 B -->
+                <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm relative overflow-hidden flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-3 mb-3">
+                            <span class="text-2xl">🏡</span>
+                            <div>
+                                <h3 class="font-bold text-zinc-900">輸入暗號：我們這一家</h3>
+                                <p class="text-xs text-slate-400">所有家人即時同步編輯</p>
+                            </div>
+                        </div>
+                        <div class="bg-slate-50 p-3 rounded-lg text-xs text-slate-500">
+                            這裡會顯示：巷口乾麵、阿嬤最愛泰式料理等，**一秒切換到全新的獨立清單！**
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 智慧清理提示 -->
+            <div class="mt-6 bg-emerald-50 border-l-4 border-emerald-500 p-4 rounded-r-xl">
+                <p class="text-xs md:text-sm text-emerald-800 leading-relaxed">
+                    🔒 <strong>防感染智慧清理：</strong> 為了防止資料錯亂，只要你在網頁最上方的輸入框中，將暗號從 `A` 換成 `B`，**本地畫面會在 0.01 秒內徹底將上一間的資料打包收好、安全清空，再全新連入 B 房間**，確保大家的資料絕對互不干擾、各自獨立！
+                </p>
+            </div>
+        </section>
+
+        <!-- 單元三：新增與編輯商家 -->
+        <section class="mb-12">
+            <div class="flex items-center gap-3 mb-6 border-b border-slate-200 pb-3">
+                <span class="bg-zinc-900 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">3</span>
+                <h2 class="text-xl font-bold text-zinc-900">新增美食商家與美味祕密配方</h2>
+            </div>
+
+            <p class="text-slate-600 mb-6 text-sm md:text-base">
+                點選美食地圖最上方的 **「➕ 新增美食商家」分頁**（這個設計把新增跟搜尋徹底分開，再也不會讓搜尋結果擋住你的輸入視線了！），你就可以把口袋名單填入：
+            </p>
+
+            <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="border border-slate-100 p-3 rounded-xl bg-slate-50">
+                        <span class="text-xs font-bold text-blue-600 uppercase">智慧分家 📍</span>
+                        <h4 class="font-bold text-zinc-950 mt-1">「風格」與「地區」獨立格子</h4>
+                        <p class="text-xs text-slate-500 mt-1">例如：風格填「古早味早餐」，地區填「大園區」，各自獨立，乾淨俐落！</p>
+                    </div>
+                    <div class="border border-slate-100 p-3 rounded-xl bg-slate-50">
+                        <span class="text-xs font-bold text-yellow-600 uppercase">美味標籤 📝</span>
+                        <h4 class="font-bold text-zinc-950 mt-1">美味備註便利貼</h4>
+                        <p class="text-xs text-slate-500 mt-1">可以把「粉漿蛋餅必點、特製辣醬超讚」寫進去。在清單卡片上會呈現像暖黃色便利貼一樣，超級好讀！</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="border border-slate-100 p-3 rounded-xl bg-slate-50">
+                        <span class="text-xs font-bold text-emerald-600 uppercase">外送服務 🛵</span>
+                        <h4 class="font-bold text-zinc-950 mt-1">支援外送勾選框</h4>
+                        <p class="text-xs text-slate-500 mt-1">如果點選了外送。卡片上會跑出可愛的「🛵 M 支援外送」紅色小貼章，找外送店家超方便！</p>
+                    </div>
+                    <div class="border border-slate-100 p-3 rounded-xl bg-slate-50">
+                        <span class="text-xs font-bold text-purple-600 uppercase">智慧收摺 ⏰</span>
+                        <h4 class="font-bold text-zinc-950 mt-1">一週營業時間抽屜</h4>
+                        <p class="text-xs text-slate-500 mt-1">預設是收合起來的，不佔任何畫面空間，也完全不影響滑動；點選它就會流暢展開，輸入極直覺！</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 編輯與刪除說明 (🌟 採用 100% 剛性網格 Grid 修正跑版問題！) -->
+            <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-2xl border border-slate-200">
+                <div class="space-y-2">
+                    <h3 class="font-bold text-zinc-900 text-base flex items-center gap-2">
+                        <span>✏️</span> 隨時進行修改與編輯
+                    </h3>
+                    <p class="text-slate-600 text-xs md:text-sm leading-relaxed">
+                        在清單中，每家餐廳右下角都有一個 **「✏️ 編輯」按鈕**。點選後，系統會極貼心地自動切換到新增分頁，並把所有店名、營業時間直接「自動填入」，你修改好後按下「儲存修改」即刻完成！
+                    </p>
+                </div>
+                <div class="border-t md:border-t-0 md:border-l border-slate-200 pt-4 md:pt-0 md:pl-6 space-y-2">
+                    <h3 class="font-bold text-red-600 text-base flex items-center gap-2">
+                        <span>🗑️</span> 安全刪除防誤觸
+                    </h3>
+                    <p class="text-slate-600 text-xs md:text-sm leading-relaxed">
+                        我們設計了「美化確認彈出視窗」，即使不小心點到刪除，也會彈出精緻提示問你是否確認，再也不怕手指胖胖誤刪資料！
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 單元四：地圖導航與地區篩選 -->
+        <section class="mb-12">
+            <div class="flex items-center gap-3 mb-6 border-b border-slate-200 pb-3">
+                <span class="bg-zinc-900 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">4</span>
+                <h2 class="text-xl font-bold text-zinc-900">查看地圖導航與智慧篩選系統</h2>
+            </div>
+
+            <!-- 地圖與搜尋說明 (採用剛性 col-span 格柵防跑版) -->
+            <div class="space-y-6">
+                <!-- 地圖 -->
+                <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+                    <div class="md:col-span-2 space-y-2">
+                        <span class="text-blue-600 text-xs font-bold uppercase">精準定位 🗺️</span>
+                        <h3 class="font-bold text-zinc-900 text-lg">點選美食小卡，右側地圖自動跟隨</h3>
+                        <p class="text-slate-600 text-xs md:text-sm leading-relaxed">
+                            在新增美食時，地圖網址格子可以貼上你在 Google Map 複製出來的「分享短網址」。
+                            點選左側名單上的小卡片時，**右側（在手機上則是下半部）就會自動把這家店的實景地圖精準內嵌顯現出來**，還能直接縮放、查看交通位置，帶路體驗無比流暢！
+                        </p>
+                    </div>
+                    <div class="bg-slate-100 rounded-xl p-4 border border-slate-200 flex flex-col items-center justify-center text-center">
+                        <span class="text-3xl mb-1">📍</span>
+                        <p class="font-bold text-xs text-slate-700">自動定位實景</p>
+                        <p class="text-[10px] text-slate-400 mt-1">支援所有主流手機與平板瀏覽器</p>
+                    </div>
+                </div>
+
+                <!-- 篩選 -->
+                <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+                    <div class="md:col-span-2 space-y-2">
+                        <span class="text-emerald-600 text-xs font-bold uppercase">智慧整理 🔍</span>
+                        <h3 class="font-bold text-zinc-900 text-lg">自動偵測地區，1秒找出今晚吃什麼</h3>
+                        <p class="text-slate-600 text-xs md:text-sm leading-relaxed">
+                            我們在清單上方設計了 **「時段」與「地區」雙下拉選單**，加上搜尋輸入框。
+                            地區選單是**全自動且智慧的**！只要你有新增任何新的地區（例如大園區），下拉選單就會自己學習並多出這個地區選項，點選地區就能立刻單獨過濾，好用到不行！
+                        </p>
+                    </div>
+                    <div class="bg-slate-100 rounded-xl p-4 border border-slate-200 flex flex-col items-center justify-center text-center">
+                        <span class="text-3xl mb-1">⚡</span>
+                        <p class="font-bold text-xs text-slate-700">自動智慧學習地區</p>
+                        <p class="text-[10px] text-slate-400 mt-1">免手動設定，有填即會出現</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 結尾鼓勵區 -->
+        <section class="bg-zinc-900 text-white p-8 rounded-3xl text-center shadow-lg relative overflow-hidden">
+            <div class="absolute inset-0 bg-grid-white/[0.05] bg-[size:20px_20px] pointer-events-none"></div>
+            <div class="relative z-10">
+                <span class="text-4xl mb-3 inline-block">🚀</span>
+                <h2 class="text-2xl font-bold mb-3">準備好開始建立你們的美食城堡了嗎？</h2>
+                <p class="text-zinc-400 text-sm max-w-lg mx-auto mb-6">
+                    現在，只要把你們建立好的美食地圖網址複製下來，後面加上你們的**自訂暗號**（例如：`#公司下午茶團`）傳到群組，大家點開就直接在同一個雲端包廂即時共編囉！
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="https://stu375perkg-cloud.github.io/myfoodmap/" target="_blank" class="bg-white text-zinc-950 px-6 py-3 rounded-xl font-bold text-sm shadow hover:bg-zinc-100 transition inline-block">
+                        👉 點此前往我們的美食地圖
+                    </a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 底部版權 -->
+    <footer class="text-center py-8 text-xs text-slate-400 border-t border-slate-200 bg-white mt-12">
+        <p>© 2026 口袋美食地圖共同編輯小組．用愛與美食連結彼此 🍕</p>
+    </footer>
+
+</body>
+</html>
