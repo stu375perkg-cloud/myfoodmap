@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的專屬美食地圖資料庫 - 雲端即時共享版</title>
+    <title>我的專屬美食地圖資料庫 - Google 雲端即時版</title>
     <style>
         /* 基礎樣式設定 */
         * {
@@ -783,7 +783,7 @@
             <div class="sync-action-row" id="syncActionRow" style="display: none;">
                 <div class="sync-button-group">
                     <button class="btn-copy-link" onclick="copyShareLink()">
-                        📋 複製好友專屬分享連結
+                        📋 複製專屬分享連結給好友
                     </button>
                     <button class="btn-custom-key" onclick="toggleCustomKeyConfig()">
                         ⚙️ 自訂 Google 雲端金鑰
@@ -838,7 +838,7 @@
                     
                     <input type="text" id="searchKeyword" placeholder="搜尋店名、風格、地區、備註..." style="margin-top: 5px;">
                     
-                    <!-- 新增實體搜尋按鈕，防止罷工並實現精準 AND 交集重疊篩選 -->
+                    <!-- 實體搜尋按鈕實現精準 AND 交集重疊篩選 -->
                     <button class="btn-submit" onclick="renderList()" style="margin-top: 5px; background-color: #1a1a1a;">🔍 開始搜尋</button>
                 </div>
                 <div class="restaurant-list" id="restaurantList"></div>
@@ -854,7 +854,7 @@
                     </div>
                     
                     <div class="form-group">
-                        <!-- 用餐時段全面升級為多選框 -->
+                        <!-- 用餐時段多選框 -->
                         <label>用餐時段 (可多選) *</label>
                         <div class="checkbox-group" id="restTimeSlot">
                             <label class="checkbox-item"><input type="checkbox" value="早餐"> 早餐</label>
@@ -982,11 +982,10 @@
             return 'box_' + hex;
         }
 
-        // 智慧升級：修補並自動相容舊版單一字串 timeSlot，無痛轉化為陣列
+        // 智慧升級：修補舊版單一字串格式，轉換為陣列
         function upgradeOldData() {
             let hasUpgraded = false;
             restaurants.forEach(item => {
-                // 1. 若只有舊版字串，無痛轉化為多選陣列
                 if (item.timeSlot && !item.timeSlots) {
                     item.timeSlots = [item.timeSlot];
                     hasUpgraded = true;
@@ -996,7 +995,6 @@
                     hasUpgraded = true;
                 }
                 
-                // 2. 風格與地區分離
                 if (item.district === undefined) {
                     if (item.style && item.style.includes('/')) {
                         const parts = item.style.split('/');
@@ -1119,7 +1117,7 @@
 
         function closeConfirmModal() { document.getElementById('confirmModal').style.display = 'none'; }
 
-        // 🌟 地區動態生成為多選核取藥丸
+        // 地區動態生成為多選核取藥丸
         function updateDistrictDropdown() {
             const container = document.getElementById('filterDistrict');
             if (!container) return;
@@ -1137,7 +1135,6 @@
                 label.className = 'checkbox-item';
                 label.innerHTML = `<input type="checkbox" value="${dist}"> ${dist}`;
                 
-                // 動態綁定變色手勢
                 label.querySelector('input').addEventListener('change', function() {
                     if (this.checked) {
                         label.classList.add('checked');
@@ -1150,7 +1147,6 @@
             });
         }
 
-        // 送出新增 / 修改
         function handleSubmit() {
             const name = document.getElementById('restName').value.trim();
             const style = document.getElementById('restStyle').value.trim() || "未分類";
@@ -1162,7 +1158,6 @@
 
             if (!name) { showToast('請填寫餐廳名稱喔！'); return; }
 
-            // 1. 搜集複選時段
             const selectedTimeSlots = [];
             document.querySelectorAll('#restTimeSlot input:checked').forEach(cb => {
                 selectedTimeSlots.push(cb.value);
@@ -1224,7 +1219,6 @@
             }
         }
 
-        // 啟動編輯模式
         function startEditRestaurant(id, event) {
             event.stopPropagation();
             const rest = restaurants.find(item => item.id === id);
@@ -1239,7 +1233,6 @@
             document.getElementById('restMapUrl').value = rest.mapUrl;
             document.getElementById('restNotes').value = rest.notes || "";
             
-            // 恢復營業時間
             document.getElementById('h-mon').value = rest.hours.mon === "未填寫" ? "" : rest.hours.mon;
             document.getElementById('h-tue').value = rest.hours.tue === "未填寫" ? "" : rest.hours.tue;
             document.getElementById('h-wed').value = rest.hours.wed === "未填寫" ? "" : rest.hours.wed;
@@ -1248,7 +1241,6 @@
             document.getElementById('h-sat').value = rest.hours.sat === "未填寫" ? "" : rest.hours.sat;
             document.getElementById('h-sun').value = rest.hours.sun === "未填寫" ? "" : rest.hours.sun;
             
-            // 重設並勾選對應的時段 Checkbox
             document.querySelectorAll('#restTimeSlot input').forEach(cb => {
                 cb.checked = false;
                 cb.parentElement.classList.remove('checked');
@@ -1308,7 +1300,6 @@
             document.getElementById('restMapUrl').value = '';
             document.querySelectorAll('.week-hours-input input').forEach(input => input.value = '');
             
-            // 清空時段勾選
             document.querySelectorAll('#restTimeSlot input').forEach(cb => {
                 cb.checked = false;
                 cb.parentElement.classList.remove('checked');
@@ -1335,42 +1326,27 @@
             else { detailDiv.style.display = 'block'; btn.innerHTML = '收合營業時間 ▴'; }
         }
 
-        // 🌟 智慧萬用轉換與無阻擋導航地圖
+        // 智慧萬用地址轉換與無阻擋 Google Map 連線引擎 (100% 解決連線被拒絕)
         function selectRestaurant(id, element) {
             document.querySelectorAll('.restaurant-item').forEach(item => item.classList.remove('active'));
             element.classList.add('active');
             const rest = restaurants.find(item => item.id === id);
             if (!rest) return;
 
-            let finalMapSrc = "";
-            const isGoogleUrl = rest.mapUrl && rest.mapUrl.includes("google.com/maps");
-
-            if (isGoogleUrl) {
-                // 如果是完整的 Google 地圖分享連結，在小窗戶會被阻擋
-                // 智慧轉化：提取餐廳名稱與地區，直接向 Google 地圖官方進行精準內嵌搜尋，100% 不會被安全警衛阻擋
-                const searchParam = encodeURIComponent(`${rest.name} ${rest.district}`);
-                finalMapSrc = `https://maps.google.com/maps?q=${searchParam}&output=embed`;
-            } else if (rest.mapUrl && (rest.mapUrl.startsWith("http://") || rest.mapUrl.startsWith("https://"))) {
-                // 其他自訂內嵌網址
-                finalMapSrc = rest.mapUrl;
-            } else {
-                // 若無網址，直接用「名字＋地區」進行萬用官方內嵌，體驗無比流暢！
-                const searchParam = encodeURIComponent(`${rest.name} ${rest.district}`);
-                finalMapSrc = `https://maps.google.com/maps?q=${searchParam}&output=embed`;
-            }
+            // 智慧轉化：一律提取「名字＋地區」，直接向 Google 官方搜尋 API 索取嵌入，絕不發生轉址阻擋！
+            const searchParam = encodeURIComponent(`${rest.name} ${rest.district}`);
+            const finalMapSrc = `https://maps.google.com/maps?q=${searchParam}&output=embed`;
 
             document.getElementById('mapPanel').innerHTML = `<iframe src="${finalMapSrc}" allowfullscreen="" loading="lazy"></iframe>`;
         }
 
-        // 🌟 核心升級：100% 嚴格交叉 (AND) 重疊複選篩選邏輯
+        // 100% 嚴格交叉 (AND) 重疊複選篩選邏輯
         function renderList() {
-            // 1. 取得勾選的篩選時段
             const selectedTimes = [];
             document.querySelectorAll('#filterTime input:checked').forEach(cb => {
                 selectedTimes.push(cb.value);
             });
 
-            // 2. 取得勾選的篩選地區
             const selectedDistricts = [];
             document.querySelectorAll('#filterDistrict input:checked').forEach(cb => {
                 selectedDistricts.push(cb.value);
@@ -1381,20 +1357,15 @@
             listContainer.innerHTML = '';
 
             const filtered = restaurants.filter(item => {
-                // 用餐時段比對 (店家時段數組 item.timeSlots 必須與勾選時段 selectedTimes 有交集)
                 const matchTime = selectedTimes.length === 0 || selectedTimes.some(t => item.timeSlots.includes(t));
-                
-                // 地區比對 (店家地區 item.district 必須在勾選的地區數組中)
                 const matchDistrict = selectedDistricts.length === 0 || selectedDistricts.includes(item.district);
                 
-                // 關鍵字搜尋
                 const itemNotes = item.notes || "";
                 const matchKeyword = item.name.toLowerCase().includes(searchKeyword) || 
                                      item.style.toLowerCase().includes(searchKeyword) || 
                                      item.district.toLowerCase().includes(searchKeyword) || 
                                      itemNotes.toLowerCase().includes(searchKeyword);
                 
-                // 嚴格交集：時段條件符合 AND 地區條件符合 AND 關鍵字符合
                 return matchTime && matchDistrict && matchKeyword;
             });
 
@@ -1411,7 +1382,6 @@
                 const deliveryHtml = item.hasDelivery ? `<span class="badge badge-delivery">🛵 支援外送</span>` : '';
                 const notesHtml = item.notes ? `<div class="item-notes">📝 ${item.notes}</div>` : '';
                 
-                // 用餐時段多選黑標章渲染
                 const timeBadgesHtml = item.timeSlots.map(t => `<span class="badge">${t}</span>`).join(' ');
 
                 itemDiv.innerHTML = `
@@ -1548,7 +1518,7 @@
             initFirebase();
         }
 
-        // 綁定點選變色手勢（新增 / 篩選時段 Checkbox 點擊變黑底）
+        // 藥丸按鈕點選變色綁定
         function setupPillsBehavior() {
             document.querySelectorAll('.checkbox-item').forEach(label => {
                 const cb = label.querySelector('input[type="checkbox"]');
@@ -1569,14 +1539,11 @@
             initFirebase();
             setupPillsBehavior();
             
-            // 安全綁定外送勾選框點擊手勢
             const deliveryContainer = document.getElementById('deliveryContainer');
             if (deliveryContainer) {
                 deliveryContainer.addEventListener('click', function(e) {
                     const checkbox = document.getElementById('restDelivery');
-                    if (checkbox && e.target !== checkbox) {
-                        checkbox.checked = !checkbox.checked;
-                    }
+                    if (checkbox && e.target !== checkbox) checkbox.checked = !checkbox.checked;
                 });
             }
         });
