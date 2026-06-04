@@ -7,7 +7,6 @@
     <!-- 引入高質感 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* 細緻字體與流暢動畫優化 */
         * {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         }
@@ -22,7 +21,7 @@
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
 
-    <!-- 1. 精緻大氣頂部 Header -->
+    <!-- 頂部 Header -->
     <header class="bg-zinc-900 text-white py-12 px-6 text-center shadow-md">
         <div class="max-w-3xl mx-auto">
             <span class="bg-amber-500 text-zinc-900 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">官方指南</span>
@@ -31,7 +30,7 @@
         </div>
     </header>
 
-    <!-- 2. 主要內容區域 -->
+    <!-- 主要內容區域 -->
     <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-10">
         
         <!-- 前言簡介卡片 -->
@@ -66,7 +65,7 @@
                         複製網頁中大括號 <code>{ ... }</code> 內的所有金鑰文字，點開地圖上方「自訂 Google 雲端金鑰」並貼上儲存。
                     </div>
                     <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                        <strong class="text-zinc-900 block mb-1">C. 啟用資料庫</strong>
+                        <strong class="text-zinc-900 block mb-1">C. 建立 Firestore 資料庫</strong>
                         在 Firebase 左側點擊「Firestore Database」建立資料庫（並務必點選「測試模式啟動」）。
                     </div>
                     <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
@@ -138,7 +137,7 @@
                             我們在口袋美食清單上方設計了 **「時段」與「地區」多選藥丸按鈕**，並在下方裝配了實體的 **「🔍 開始搜尋」** 按鈕。
                         </p>
                         <p class="leading-relaxed">
-                            <strong>100% 條件重疊 (AND 邏輯)：</strong> 如果您同時勾選「晚餐」與「大園區」，系統會進行最嚴格的交叉比對。<strong>只有同時符合「晚餐」且位於「大園區」的店家才會被顯示出來</strong>，這能幫您一秒找出今晚要吃什麼！
+                            <strong>100% 條件重疊 (AND 邏輯)：</strong> 如果您同時勾選「晚餐」與「大園區」，系統會進行最嚴格的交叉比對。<strong>只有同時符合「晚餐」且位於「大園區」的店家才會被顯示出來</strong>，這能幫您一秒找出最精確的口袋美食！
                         </p>
                     </div>
                     <div class="bg-slate-100/70 p-4 rounded-xl flex flex-col justify-center gap-2 border border-slate-200 text-xs font-bold text-slate-600 space-y-1">
@@ -161,7 +160,7 @@
                 點擊下方按鈕前往你們的美食地圖，若已經帶有暗號，網頁將會智慧自動幫您連線登入！
             </p>
             <div class="mt-8">
-                <a id="goToMapBtn" href="https://stu375perkg-cloud.github.io/myfoodmap/" class="inline-flex items-center gap-2 bg-white text-zinc-900 font-extrabold text-sm px-8 py-3 rounded-full hover:bg-zinc-100 transition shadow-md">
+                <a id="goToMapBtn" href="./index.html" class="inline-flex items-center gap-2 bg-white text-zinc-900 font-extrabold text-sm px-8 py-3 rounded-full hover:bg-zinc-100 transition shadow-md">
                     👉 點此前往我們的美食地圖
                 </a>
             </div>
@@ -188,9 +187,10 @@
         window.addEventListener('DOMContentLoaded', () => {
             const currentHash = window.location.hash;
             const targetBtn = document.getElementById('goToMapBtn');
-            if (targetBtn && currentHash) {
-                // 如果目前手冊網址後面有 #最愛沛雯，點擊前往地圖時會智慧自動帶過去，無痛自動同步！
-                targetBtn.href = "https://stu375perkg-cloud.github.io/myfoodmap/" + currentHash;
+            if (targetBtn) {
+                // 自動讀取手冊網址帶有的 #暗號，無痛傳承給主地圖 index.html，體驗最完美
+                const baseUrl = "./index.html";
+                targetBtn.href = currentHash ? baseUrl + currentHash : baseUrl;
             }
         });
     </script>
