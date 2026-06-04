@@ -46,7 +46,7 @@
         <!-- 步驟引導大綱 -->
         <div class="space-y-10">
 
-            <!-- 步驟 1：雲端設定 -->
+            <!-- 步驟 1：雲端設定 (已完美修正順序邏輯) -->
             <section class="step-card bg-white rounded-2xl border border-slate-200 p-6 md:p-8 relative">
                 <div class="absolute -top-4 left-6 bg-zinc-900 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm shadow-md">1</div>
                 <h3 class="text-lg font-bold text-zinc-900 mb-4 pt-1 flex items-center gap-2">
@@ -58,19 +58,19 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-slate-600">
                     <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
                         <strong class="text-zinc-900 block mb-1">A. 註冊 Google 專案</strong>
-                        請至 <a href="https://console.firebase.google.com/" target="_blank" class="text-blue-600 font-bold hover:underline">Firebase 控制台</a> 新增專案，點選「網頁 (Web) `</>`」圖示註冊。
+                        請至 <a href="https://console.firebase.google.com/" target="_blank" class="text-blue-600 font-bold hover:underline">Firebase 控制台</a> 新增專案，點選「網頁 (Web) `</>`」圖示註冊應用程式，並複製產生的大括號 <code>firebaseConfig</code> 代碼。
                     </div>
                     <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                        <strong class="text-zinc-900 block mb-1">B. 複製並貼上金鑰</strong>
-                        複製網頁中大括號 <code>{ ... }</code> 內的所有金鑰文字，點開地圖上方「自訂 Google 雲端金鑰」並貼上儲存。
+                        <strong class="text-zinc-900 block mb-1">B. 建立 Firestore 資料庫</strong>
+                        在 Firebase 網頁左側點擊「Firestore Database」建立資料庫（並務必點選「測試模式啟動」），打通資料的雲端通道。
                     </div>
                     <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                        <strong class="text-zinc-900 block mb-1">C. 建立 Firestore 資料庫</strong>
-                        在 Firebase 左側點擊「Firestore Database」建立資料庫（並務必點選「測試模式啟動」）。
+                        <strong class="text-zinc-900 block mb-1">C. 啟用匿名登入</strong>
+                        點擊「Authentication」，在登入方法 (Sign-in method) 中啟用「匿名 (Anonymous)」並儲存，發放網頁的免密碼門票。
                     </div>
-                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                        <strong class="text-zinc-900 block mb-1">D. 啟用匿名登入</strong>
-                        點擊「Authentication」，在登入方法 (Sign-in method) 中啟用「匿名 (Anonymous)」並儲存。
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-100/80 bg-amber-50/50 border-amber-200">
+                        <strong class="text-amber-800 block mb-1">D. 貼上並正式連線</strong>
+                        最後回到地圖網頁，點開上方「自訂 Google 雲端金鑰」，將大括號 <code>{ ... }</code> 內的所有代碼貼上儲存，即完成所有綁定！
                     </div>
                 </div>
             </section>
