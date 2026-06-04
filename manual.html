@@ -10,9 +10,6 @@
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         }
-        .step-number {
-            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen">
@@ -254,20 +251,23 @@
                     </div>
                 </div>
 
-                <!-- 篩選 -->
+                <!-- 篩選與重疊搜尋按鈕 (🌟 對準第三張圖搜尋按鈕設計更新！) -->
                 <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
                     <div class="md:col-span-2 space-y-2">
-                        <span class="text-emerald-600 text-xs font-bold uppercase">智慧整理 🔍</span>
-                        <h3 class="font-bold text-zinc-900 text-lg">自動偵測地區，1秒找出今晚吃什麼</h3>
-                        <p class="text-slate-600 text-xs md:text-sm leading-relaxed">
-                            我們在清單上方設計了 **「時段」與「地區」雙下拉選單**，加上搜尋輸入框。
-                            地區選單是**全自動且智慧的**！只要你有新增任何新的地區（例如大園區），下拉選單就會自己學習並多出這個地區選項，點選地區就能立刻單獨過濾，好用到不行！
+                        <span class="text-emerald-600 text-xs font-bold uppercase">智慧整理與 🔍 搜尋 ⚡</span>
+                        <h3 class="font-bold text-zinc-900 text-lg">雙重條件「重疊篩選」，點擊搜尋立刻對時</h3>
+                        <p class="text-slate-600 text-xs md:text-sm leading-relaxed mb-2">
+                            我們在清單上方設計了 **「時段」與「地區」雙下拉選單**，並在下方加裝了黑色 **「🔍 搜尋」按鈕**！
                         </p>
+                        <ul class="text-slate-600 text-xs md:text-sm leading-relaxed list-disc pl-5 space-y-1">
+                            <li><strong>100% 條件重疊：</strong> 如果時段選「晚餐」、地區選「大園區」，系統會進行嚴格的交叉比對。<strong>只有同時符合這兩個標籤的店家才會被顯示出來</strong>，而不會胡亂二選一顯示！</li>
+                            <li><strong>點擊搜尋按鈕起作用：</strong> 挑選好條件後，直接點擊下方黑色按鈕，Google 雲端就會立即為你完美抓出對應的美食名單！</li>
+                        </ul>
                     </div>
                     <div class="bg-slate-100 rounded-xl p-4 border border-slate-200 flex flex-col items-center justify-center text-center">
-                        <span class="text-3xl mb-1">⚡</span>
-                        <p class="font-bold text-xs text-slate-700">自動智慧學習地區</p>
-                        <p class="text-[10px] text-slate-400 mt-1">免手動設定，有填即會出現</p>
+                        <span class="text-3xl mb-1">🔍</span>
+                        <p class="font-bold text-xs text-slate-700">雙條件重疊 AND 篩選</p>
+                        <p class="text-[10px] text-slate-400 mt-1">點擊搜尋按鈕，瞬間精準呈現</p>
                     </div>
                 </div>
             </div>
@@ -283,9 +283,21 @@
                     現在，只要把你們建立好的美食地圖網址複製下來，後面加上你們的**自訂暗號**（例如：`#公司下午茶團`）傳到群組，大家點開就直接在同一個雲端包廂即時共編囉！
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <!-- 🌟 100% 修正連結指向你們成功部署、具有最新「搜尋功能」的主地圖網址！ -->
                     <a href="https://stu375perkg-cloud.github.io/myfoodmap/" target="_blank" class="bg-white text-zinc-950 px-6 py-3 rounded-xl font-bold text-sm shadow hover:bg-zinc-100 transition inline-block">
                         👉 點此前往我們的美食地圖
                     </a>
+                </div>
+                
+                <!-- 💡 溫馨除錯小提示卡 -->
+                <div class="mt-8 bg-zinc-800/80 border border-zinc-700 p-4 rounded-2xl max-w-md mx-auto text-left">
+                    <p class="text-xs text-zinc-300 leading-relaxed">
+                        💡 <strong>防瀏覽器頑固記憶小撇步：</strong><br>
+                        因為瀏覽器非常固執，如果點開上方的連結「沒有看到黑色的搜尋按鈕」，代表你的裝置正看著「舊網頁的殘留記憶」。請在此網頁上：
+                        <br><span class="text-yellow-400 font-semibold">• Windows 電腦：</span> 按下鍵盤的 <kbd class="bg-zinc-700 px-1 py-0.5 rounded text-[10px]">Ctrl</kbd> + <kbd class="bg-zinc-700 px-1 py-0.5 rounded text-[10px]">F5</kbd> 
+                        <br><span class="text-yellow-400 font-semibold">• Mac 電腦：</span> 按下鍵盤的 <kbd class="bg-zinc-700 px-1 py-0.5 rounded text-[10px]">Cmd ⌘</kbd> + <kbd class="bg-zinc-700 px-1 py-0.5 rounded text-[10px]">Shift</kbd> + <kbd class="bg-zinc-700 px-1 py-0.5 rounded text-[10px]">R</kbd>
+                        <br><span class="text-yellow-400 font-semibold">• 手機：</span> 關閉分頁、或在設定中清除 Safari / Chrome 的快取資料，最新版就會瞬間魔法般跳出來囉！
+                    </p>
                 </div>
             </div>
         </section>
